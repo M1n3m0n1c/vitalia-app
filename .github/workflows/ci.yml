@@ -1,0 +1,139 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: web-ui/package-lock.json
+        
+    - name: Instalar dependências
+      working-directory: ./web-ui
+      run: npm ci
+      
+    - name: Verificar tipos TypeScript
+      working-directory: ./web-ui
+      run: npm run type-check
+      
+    - name: Executar linting
+      working-directory: ./web-ui
+      run: npm run lint
+      
+    - name: Verificar formatação
+      working-directory: ./web-ui
+      run: npm run format:check
+      
+    - name: Executar testes
+      working-directory: ./web-ui
+      run: npm run test:ci
+      
+    - name: Upload coverage para Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./web-ui/coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: web-ui/package-lock.json
+        
+    - name: Instalar dependências
+      working-directory: ./web-ui
+      run: npm ci
+      
+    - name: Build aplicação
+      working-directory: ./web-ui
+      run: npm run build
+      env:
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-files
+        path: web-ui/.next/
+        retention-days: 7
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Run Snyk para verificar vulnerabilidades
+      uses: snyk/actions/node@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high --file=web-ui/package.json
+        
+    - name: Audit npm para vulnerabilidades
+      working-directory: ./web-ui
+      run: npm audit --audit-level moderate
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: github.ref == 'refs/heads/develop'
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Deploy para Staging
+      run: |
+        echo "🚀 Deploy para ambiente de staging"
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
+        # Aqui seria integrado com Vercel, Netlify ou outro provedor
+        
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [test, build, security-scan]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Deploy para Produção
+      run: |
+        echo "🚀 Deploy para ambiente de produção"
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
+        # Aqui seria integrado com Vercel, Netlify ou outro provedor 
