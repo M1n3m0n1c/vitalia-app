@@ -101,4 +101,7 @@ tmp/
 temp/
 
 # Editor directories and files
-.cursor/ 
+.cursor/
+
+# Deploy reports
+web-ui/deploy-reports/ 

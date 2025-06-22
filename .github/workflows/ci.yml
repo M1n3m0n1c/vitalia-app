@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   test:
@@ -17,123 +17,149 @@ jobs:
     steps:
     - name: Checkout código
       uses: actions/checkout@v4
-      
+    
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: web-ui/package-lock.json
-        
+    
     - name: Instalar dependências
-      working-directory: ./web-ui
-      run: npm ci
-      
-    - name: Verificar tipos TypeScript
-      working-directory: ./web-ui
-      run: npm run type-check
-      
-    - name: Executar linting
-      working-directory: ./web-ui
-      run: npm run lint
-      
-    - name: Verificar formatação
-      working-directory: ./web-ui
-      run: npm run format:check
-      
+      run: |
+        cd web-ui
+        npm ci
+    
+    - name: Executar lint
+      run: |
+        cd web-ui
+        npm run lint
+    
     - name: Executar testes
-      working-directory: ./web-ui
-      run: npm run test:ci
-      
-    - name: Upload coverage para Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./web-ui/coverage/lcov.info
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
+      run: |
+        cd web-ui
+        npm run test:ci
+    
+    - name: Verificar build
+      run: |
+        cd web-ui
+        npm run build
+    
+    - name: Verificar tipos TypeScript
+      run: |
+        cd web-ui
+        npm run type-check
 
-  build:
+  security:
     runs-on: ubuntu-latest
-    needs: test
     
     steps:
     - name: Checkout código
       uses: actions/checkout@v4
-      
+    
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
         cache: 'npm'
         cache-dependency-path: web-ui/package-lock.json
-        
-    - name: Instalar dependências
-      working-directory: ./web-ui
-      run: npm ci
-      
-    - name: Build aplicação
-      working-directory: ./web-ui
-      run: npm run build
-      env:
-        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-files
-        path: web-ui/.next/
-        retention-days: 7
-
-  security-scan:
-    runs-on: ubuntu-latest
-    needs: test
     
-    steps:
-    - name: Checkout código
-      uses: actions/checkout@v4
-      
-    - name: Run Snyk para verificar vulnerabilidades
-      uses: snyk/actions/node@master
-      continue-on-error: true
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: --severity-threshold=high --file=web-ui/package.json
-        
-    - name: Audit npm para vulnerabilidades
-      working-directory: ./web-ui
-      run: npm audit --audit-level moderate
+    - name: Instalar dependências
+      run: |
+        cd web-ui
+        npm ci
+    
+    - name: Auditoria de segurança
+      run: |
+        cd web-ui
+        npm audit --audit-level=high
+    
+    - name: Verificar vulnerabilidades
+      run: |
+        cd web-ui
+        npx better-npm-audit audit --level high
 
   deploy-staging:
+    needs: [test, security]
     runs-on: ubuntu-latest
-    needs: [test, build]
     if: github.ref == 'refs/heads/develop'
     
     steps:
     - name: Checkout código
       uses: actions/checkout@v4
-      
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: web-ui/package-lock.json
+    
+    - name: Instalar dependências
+      run: |
+        cd web-ui
+        npm ci
+    
+    - name: Build para staging
+      run: |
+        cd web-ui
+        npm run build
+      env:
+        NODE_ENV: staging
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+    
     - name: Deploy para Staging
       run: |
-        echo "🚀 Deploy para ambiente de staging"
-        echo "Branch: ${{ github.ref }}"
-        echo "Commit: ${{ github.sha }}"
-        # Aqui seria integrado com Vercel, Netlify ou outro provedor
-        
+        cd web-ui
+        npm run deploy:staging
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
   deploy-production:
+    needs: [test, security]
     runs-on: ubuntu-latest
-    needs: [test, build, security-scan]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     
     steps:
     - name: Checkout código
       uses: actions/checkout@v4
-      
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: web-ui/package-lock.json
+    
+    - name: Instalar dependências
+      run: |
+        cd web-ui
+        npm ci
+    
+    - name: Build para produção
+      run: |
+        cd web-ui
+        npm run build
+      env:
+        NODE_ENV: production
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}
+    
     - name: Deploy para Produção
       run: |
-        echo "🚀 Deploy para ambiente de produção"
-        echo "Branch: ${{ github.ref }}"
-        echo "Commit: ${{ github.sha }}"
-        # Aqui seria integrado com Vercel, Netlify ou outro provedor 
+        cd web-ui
+        npm run deploy:production
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    
+    - name: Notificar deploy
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: 'Deploy para produção ${{ job.status }}: ${{ github.sha }}' 
