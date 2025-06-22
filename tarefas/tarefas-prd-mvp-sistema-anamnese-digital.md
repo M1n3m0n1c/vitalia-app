@@ -57,7 +57,7 @@
   - [x] 1.7 Configurar Supabase Storage para imagens e documentos
   - [x] 1.8 Instalar dependências: React Hook Form, Zod, Zustand, LeaderLine.js
   - [x] 1.9 Configurar estrutura de testes com Jest e Testing Library
-  - [ ] 1.10 Configurar CI/CD básico e scripts de deploy
+  - [x] 1.10 Configurar CI/CD básico e scripts de deploy
 
 - [ ] 2.0 Sistema de Autenticação e Gestão de Usuários
   - [ ] 2.1 Criar tabelas de usuários e organizações no Supabase
@@ -185,11 +185,11 @@
 ### 📋 Contadores de Tarefas
 - **Total de Tarefas Principais:** 8
 - **Total de Subtarefas:** 123
-- **Tarefas Concluídas:** 9
-- **Progresso Geral:** 7,3%
+- **Tarefas Concluídas:** 10
+- **Progresso Geral:** 8,1%
 
 ### ⏱️ Controle de Tempo por Tarefa
-- **1.0 Configuração do Projeto:** 10,0h / ~20h estimadas
+- **1.0 Configuração do Projeto:** 15,0h / ~20h estimadas (CONCLUÍDO)
 - **2.0 Autenticação e Usuários:** 0h / ~30h estimadas
 - **3.0 CRM de Pacientes:** 0h / ~25h estimadas
 - **4.0 Sistema de Questionários:** 0h / ~40h estimadas
@@ -199,7 +199,7 @@
 - **8.0 Formulário de Queixas Estéticas:** 0h / ~35h estimadas
 
 ### 🎯 Progresso por Sprint
-- **Sprint 0 (Setup):** 70% - Em andamento
+- **Sprint 0 (Setup):** 100% - CONCLUÍDO ✅
 - **Sprint 1-2 (Auth + CRM):** 0% - Não iniciado
 - **Sprint 3-4 (Questionários):** 0% - Não iniciado
 - **Sprint 5 (Agenda):** 0% - Não iniciado
@@ -222,6 +222,7 @@
 [2025-06-18 11:30] - ✅ Tarefa 1.7 concluída: Supabase Storage configurado com 3 buckets (medical-images, patient-documents, avatars), políticas RLS, utilitários de upload
 [2025-06-18 12:30] - ✅ Tarefa 1.8 concluída: Dependências instaladas - React Hook Form v7.58.1, Zod v3.25.67, Zustand v5.0.5, LeaderLine.js v1.0.8, @hookform/resolvers v5.1.1, tipos customizados para LeaderLine.js
 [2025-06-18 13:30] - ✅ Tarefa 1.9 concluída: Estrutura de testes configurada com Jest + Testing Library, testes de exemplo passando.
+[2025-06-22 16:40] - ✅ Tarefa 1.10 concluída: CI/CD completo configurado - Pipeline GitHub Actions com testes/segurança/deploy automático, scripts de deploy robustos, documentação DEPLOY.md, configuração Vercel staging/produção.
 ```
 
 ### 🔄 Instruções para Atualização
