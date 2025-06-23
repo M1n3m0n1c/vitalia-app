@@ -28,7 +28,9 @@
 - `web-ui/src/lib/validations/questionnaire.ts` - Schemas Zod para validação de questionários
 - `web-ui/src/lib/validations/patient.ts` - Schemas Zod para validação de dados de pacientes
 - `web-ui/src/lib/utils/leaderline.ts` - Utilitários para configuração do LeaderLine.js
-- `web-ui/src/hooks/useAuth.ts` - Hook customizado para autenticação
+- `web-ui/src/hooks/useAuth.ts` - Hook customizado para autenticação com gestão completa de estado
+- `web-ui/src/middleware.ts` - Middleware de proteção de rotas com verificação de sessão e permissões
+- `web-ui/src/app/(dashboard)/page.tsx` - Dashboard principal com estatísticas e ações rápidas
 - `web-ui/src/hooks/useQuestionnaire.ts` - Hook para gestão de questionários
 - `web-ui/src/store/authStore.ts` - Store Zustand para estado de autenticação
 - `web-ui/src/store/questionnaireStore.ts` - Store Zustand para estado de questionários
@@ -59,19 +61,19 @@
   - [x] 1.9 Configurar estrutura de testes com Jest e Testing Library
   - [x] 1.10 Configurar CI/CD básico e scripts de deploy
 
-- [ ] 2.0 Sistema de Autenticação e Gestão de Usuários
-  - [ ] 2.1 Criar tabelas de usuários e organizações no Supabase
-  - [ ] 2.2 Configurar Row Level Security (RLS) para todas as tabelas
-  - [ ] 2.3 Implementar página de login com React Hook Form + Zod
-  - [ ] 2.4 Implementar página de registro para novos médicos
-  - [ ] 2.5 Configurar Supabase Auth com providers de email
-  - [ ] 2.6 Criar hook useAuth para gerenciamento de estado de autenticação
-  - [ ] 2.7 Implementar middleware de proteção de rotas
-  - [ ] 2.8 Criar componente de layout para área autenticada
-  - [ ] 2.9 Implementar recuperação de senha
-  - [ ] 2.10 Implementar logout e limpeza de sessão
-  - [ ] 2.11 Configurar controle de acesso por perfis (médico, admin)
-  - [ ] 2.12 Criar dashboard principal com navegação lateral
+- [x] 2.0 Sistema de Autenticação e Gestão de Usuários
+  - [x] 2.1 Criar tabelas de usuários e organizações no Supabase
+  - [x] 2.2 Configurar Row Level Security (RLS) para todas as tabelas
+  - [x] 2.3 Implementar página de login com React Hook Form + Zod
+  - [x] 2.4 Implementar página de registro para novos médicos
+  - [x] 2.5 Configurar Supabase Auth com providers de email
+  - [x] 2.6 Criar hook useAuth para gerenciamento de estado de autenticação
+  - [x] 2.7 Implementar middleware de proteção de rotas
+  - [x] 2.8 Criar componente de layout para área autenticada
+  - [x] 2.9 Implementar recuperação de senha
+  - [x] 2.10 Implementar logout e limpeza de sessão
+  - [x] 2.11 Configurar controle de acesso por perfis (médico, admin)
+  - [x] 2.12 Criar dashboard principal com navegação lateral
 
 - [ ] 3.0 CRM de Pacientes e Gestão de Dados
   - [ ] 3.1 Criar tabela de pacientes com campos obrigatórios
@@ -179,18 +181,18 @@
 - **Início:** 17 de Junho 2025
 - **Duração Estimada:** 18 semanas (9 sprints de 2 semanas)
 - **Status Atual:** Desenvolvimento - Sprint 0
-- **Tempo Trabalhado:** 13,0 horas
-- **Data da Última Atualização:** 18 de Junho 2025
+- **Tempo Trabalhado:** 45,0 horas
+- **Data da Última Atualização:** 22 de Junho 2025
 
 ### 📋 Contadores de Tarefas
 - **Total de Tarefas Principais:** 8
 - **Total de Subtarefas:** 123
-- **Tarefas Concluídas:** 10
-- **Progresso Geral:** 8,1%
+- **Tarefas Concluídas:** 22
+- **Progresso Geral:** 17,9%
 
 ### ⏱️ Controle de Tempo por Tarefa
 - **1.0 Configuração do Projeto:** 15,0h / ~20h estimadas (CONCLUÍDO)
-- **2.0 Autenticação e Usuários:** 0h / ~30h estimadas
+- **2.0 Autenticação e Usuários:** 30,0h / ~30h estimadas (CONCLUÍDO)
 - **3.0 CRM de Pacientes:** 0h / ~25h estimadas
 - **4.0 Sistema de Questionários:** 0h / ~40h estimadas
 - **5.0 Agenda Médica:** 0h / ~20h estimadas
@@ -200,7 +202,7 @@
 
 ### 🎯 Progresso por Sprint
 - **Sprint 0 (Setup):** 100% - CONCLUÍDO ✅
-- **Sprint 1-2 (Auth + CRM):** 0% - Não iniciado
+- **Sprint 1-2 (Auth + CRM):** 50% - Em andamento
 - **Sprint 3-4 (Questionários):** 0% - Não iniciado
 - **Sprint 5 (Agenda):** 0% - Não iniciado
 - **Sprint 6 (Comparação):** 0% - Não iniciado
@@ -223,6 +225,19 @@
 [2025-06-18 12:30] - ✅ Tarefa 1.8 concluída: Dependências instaladas - React Hook Form v7.58.1, Zod v3.25.67, Zustand v5.0.5, LeaderLine.js v1.0.8, @hookform/resolvers v5.1.1, tipos customizados para LeaderLine.js
 [2025-06-18 13:30] - ✅ Tarefa 1.9 concluída: Estrutura de testes configurada com Jest + Testing Library, testes de exemplo passando.
 [2025-06-22 16:40] - ✅ Tarefa 1.10 concluída: CI/CD completo configurado - Pipeline GitHub Actions com testes/segurança/deploy automático, scripts de deploy robustos, documentação DEPLOY.md, configuração Vercel staging/produção.
+[2025-06-22 17:00] - 🚀 Início da Tarefa 2.0: Sistema de Autenticação e Gestão de Usuários
+[2025-06-22 17:05] - ✅ Tarefa 2.1 concluída: Tabelas de usuários e organizações já existiam no schema inicial
+[2025-06-22 17:10] - ✅ Tarefa 2.2 concluída: RLS já configurado para todas as tabelas com políticas adequadas
+[2025-06-22 18:00] - ✅ Tarefa 2.3 concluída: Página de login implementada com React Hook Form + Zod, validação completa, UI moderna
+[2025-06-22 19:00] - ✅ Tarefa 2.4 concluída: Página de registro implementada com campos médicos (CRM, especialidade), validação robusta
+[2025-06-22 19:05] - ✅ Tarefa 2.5 concluída: Supabase Auth já configurado nas migrações com trigger automático
+[2025-06-22 20:30] - ✅ Tarefa 2.6 concluída: Hook useAuth implementado com gestão completa de estado, perfil, sessão e métodos de auth
+[2025-06-22 21:30] - ✅ Tarefa 2.7 concluída: Middleware de proteção implementado com verificação de tokens públicos e permissões admin
+[2025-06-22 21:35] - ✅ Tarefa 2.8 concluída: DashboardLayout já existia com sidebar responsiva e navegação completa
+[2025-06-22 22:30] - ✅ Tarefa 2.9 concluída: Página de recuperação de senha implementada com fluxo completo de reset
+[2025-06-22 22:35] - ✅ Tarefa 2.10 concluída: Logout implementado no hook useAuth com limpeza de sessão
+[2025-06-22 22:40] - ✅ Tarefa 2.11 concluída: Controle de acesso implementado no middleware e hook useAuth
+[2025-06-22 23:30] - ✅ Tarefa 2.12 concluída: Dashboard principal implementado com cards de estatísticas, ações rápidas e guia de primeiros passos
 ```
 
 ### 🔄 Instruções para Atualização
