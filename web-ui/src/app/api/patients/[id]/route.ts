@@ -157,7 +157,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/patients/[id] - Excluir paciente
+// DELETE /api/patients/[id] - Exclusão suave do paciente
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -176,10 +176,10 @@ export async function DELETE(
 
     const { id } = await params
 
-    // Verificar se o paciente existe e pertence ao médico
+    // Verificar se o paciente existe e pertence ao médico (incluindo deletados)
     const { data: existingPatient, error: checkError } = await supabase
       .from('patients')
-      .select('id')
+      .select('id, deleted_at')
       .eq('id', id)
       .eq('doctor_id', user.id)
       .single()
@@ -198,36 +198,18 @@ export async function DELETE(
       )
     }
 
-    // Verificar se existem questionários respondidos para este paciente
-    const { data: responses, error: responsesError } = await supabase
-      .from('questionnaire_responses')
-      .select('id')
-      .eq('patient_id', id)
-      .limit(1)
-
-    if (responsesError) {
-      console.error('Erro ao verificar respostas:', responsesError)
+    // Verificar se já está deletado
+    if (existingPatient.deleted_at) {
       return NextResponse.json(
-        { error: 'Erro interno do servidor' },
-        { status: 500 }
+        { error: 'Paciente já foi excluído' },
+        { status: 400 }
       )
     }
 
-    // Se há respostas, não permitir exclusão (preservar histórico médico)
-    if (responses && responses.length > 0) {
-      return NextResponse.json(
-        {
-          error:
-            'Não é possível excluir paciente com histórico de questionários. Considere desativá-lo.',
-        },
-        { status: 409 }
-      )
-    }
-
-    // Excluir paciente
+    // Fazer exclusão suave
     const { error } = await supabase
       .from('patients')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
       .eq('doctor_id', user.id)
 
@@ -239,7 +221,10 @@ export async function DELETE(
       )
     }
 
-    return NextResponse.json({ message: 'Paciente excluído com sucesso' })
+    return NextResponse.json({
+      message: 'Paciente excluído com sucesso',
+      soft_delete: true,
+    })
   } catch (error) {
     console.error('Erro na API de paciente:', error)
     return NextResponse.json(

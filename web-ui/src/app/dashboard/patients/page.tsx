@@ -76,7 +76,7 @@ export default function PatientsPage() {
 
   // Filtros
   const [search, setSearch] = useState('')
-  const [gender, setGender] = useState<string>('')
+  const [gender, setGender] = useState<string>('all')
   const [sortBy, setSortBy] = useState('created_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
@@ -98,7 +98,7 @@ export default function PatientsPage() {
         params.append('search', search.trim())
       }
 
-      if (gender) {
+      if (gender && gender !== 'all') {
         params.append('gender', gender)
       }
 
@@ -231,7 +231,7 @@ export default function PatientsPage() {
                 <SelectValue placeholder='Todos os gêneros' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value=''>Todos os gêneros</SelectItem>
+                <SelectItem value='all'>Todos os gêneros</SelectItem>
                 <SelectItem value='male'>Masculino</SelectItem>
                 <SelectItem value='female'>Feminino</SelectItem>
                 <SelectItem value='other'>Outro</SelectItem>
@@ -302,11 +302,11 @@ export default function PatientsPage() {
                 Nenhum paciente encontrado
               </h3>
               <p className='text-gray-600'>
-                {search || gender
+                {search || (gender && gender !== 'all')
                   ? 'Tente ajustar os filtros para encontrar pacientes.'
                   : 'Comece cadastrando seu primeiro paciente.'}
               </p>
-              {!search && !gender && (
+              {!search && (!gender || gender === 'all') && (
                 <Button
                   onClick={() => router.push('/patients/new')}
                   className='mt-4'

@@ -106,6 +106,212 @@ INSERT INTO organizations (name, cnpj, address, phone, email) VALUES
  ), 
  '(11) 1234-5678', 'contato@clinicaexemplo.com.br');
 
+-- Seed de pacientes de exemplo
+-- Nota: Este seed deve ser executado apenas após ter um médico cadastrado no sistema
+-- Para usar este seed, substitua 'SEU_DOCTOR_ID_AQUI' pelo ID real do médico
+/*
+INSERT INTO patients (
+  full_name, 
+  email, 
+  phone, 
+  cpf, 
+  birth_date, 
+  gender, 
+  address, 
+  medical_history, 
+  doctor_id
+) VALUES 
+-- Paciente 1 - Ana Silva
+(
+  'Ana Silva Santos',
+  'ana.silva@email.com',
+  '(11) 98765-4321',
+  '123.456.789-10',
+  '1985-03-15',
+  'female',
+  jsonb_build_object(
+    'street', 'Rua das Palmeiras, 456',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01234-567',
+    'neighborhood', 'Vila Madalena'
+  ),
+  'Paciente com histórico de hipertensão controlada. Faz uso de Losartana 50mg/dia. Sem alergias conhecidas.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 2 - João Oliveira
+(
+  'João Carlos Oliveira',
+  'joao.oliveira@gmail.com',
+  '(11) 99876-5432',
+  '987.654.321-00',
+  '1978-07-22',
+  'male',
+  jsonb_build_object(
+    'street', 'Av. Paulista, 1000 - Apto 15B',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01310-100',
+    'neighborhood', 'Bela Vista'
+  ),
+  'Histórico de diabetes tipo 2. Controle glicêmico adequado com Metformina. Pratica caminhada regularmente.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 3 - Maria Fernanda
+(
+  'Maria Fernanda Costa',
+  'mariafernanda@hotmail.com',
+  '(11) 97654-3210',
+  '456.789.123-45',
+  '1992-11-08',
+  'female',
+  jsonb_build_object(
+    'street', 'Rua Augusta, 789',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01305-000',
+    'neighborhood', 'Consolação'
+  ),
+  'Paciente jovem, sem comorbidades. Busca procedimentos estéticos preventivos. Histórico familiar de melasma.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 4 - Carlos Eduardo
+(
+  'Carlos Eduardo Mendes',
+  'carlos.mendes@empresa.com.br',
+  '(11) 96543-2109',
+  '789.123.456-78',
+  '1970-05-30',
+  'male',
+  jsonb_build_object(
+    'street', 'Rua Oscar Freire, 321',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01426-001',
+    'neighborhood', 'Jardins'
+  ),
+  'Executivo, 54 anos. Histórico de estresse e insônia. Interesse em tratamentos anti-aging. Ex-fumante há 5 anos.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 5 - Beatriz Almeida
+(
+  'Beatriz Almeida Rodrigues',
+  'bia.almeida@outlook.com',
+  '(11) 95432-1098',
+  '321.654.987-12',
+  '1988-12-03',
+  'female',
+  jsonb_build_object(
+    'street', 'Rua Haddock Lobo, 567',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01414-001',
+    'neighborhood', 'Cerqueira César'
+  ),
+  'Mãe de 2 filhos. Pós-gestacional, busca tratamentos para flacidez abdominal. Amamentou até recentemente.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 6 - Roberto Santos
+(
+  'Roberto Santos Lima',
+  'roberto.lima@yahoo.com.br',
+  '(11) 94321-0987',
+  '654.987.321-34',
+  '1965-09-18',
+  'male',
+  jsonb_build_object(
+    'street', 'Rua Teodoro Sampaio, 890',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '05405-000',
+    'neighborhood', 'Pinheiros'
+  ),
+  'Aposentado, 59 anos. Histórico de câncer de pele (carcinoma basocelular) tratado. Acompanhamento dermatológico regular.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 7 - Juliana Martins
+(
+  'Juliana Martins Pereira',
+  'ju.martins@gmail.com',
+  '(11) 93210-9876',
+  '159.753.486-20',
+  '1995-04-12',
+  'female',
+  jsonb_build_object(
+    'street', 'Rua Consolação, 1234',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01302-000',
+    'neighborhood', 'Consolação'
+  ),
+  'Estudante de medicina, 29 anos. Acne adulta persistente. Já utilizou isotretinoína com boa resposta.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 8 - Fernando Souza
+(
+  'Fernando Souza Barbosa',
+  'fernando.sb@uol.com.br',
+  '(11) 92109-8765',
+  '753.159.486-57',
+  '1982-01-25',
+  'male',
+  jsonb_build_object(
+    'street', 'Av. Faria Lima, 2000 - Conj 45',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01452-000',
+    'neighborhood', 'Jardim Paulistano'
+  ),
+  'Advogado, 42 anos. Alopecia androgenética progressiva. Interesse em transplante capilar. Sem outras comorbidades.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 9 - Camila Torres
+(
+  'Camila Torres Ribeiro',
+  'camila.torres@designer.com',
+  '(11) 91098-7654',
+  '486.159.753-91',
+  '1990-08-07',
+  'female',
+  jsonb_build_object(
+    'street', 'Rua Bela Cintra, 678',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01415-000',
+    'neighborhood', 'Consolação'
+  ),
+  'Designer gráfica, 34 anos. Rosácea facial leve a moderada. Pele sensível. Evita exposição solar excessiva.',
+  'SEU_DOCTOR_ID_AQUI'
+),
+
+-- Paciente 10 - Antônio Ferreira
+(
+  'Antônio Ferreira Neto',
+  'antonio.neto@construcao.com.br',
+  '(11) 90987-6543',
+  '357.951.486-24',
+  '1975-06-14',
+  'male',
+  jsonb_build_object(
+    'street', 'Rua da Consolação, 2345',
+    'city', 'São Paulo',
+    'state', 'SP',
+    'zip_code', '01301-000',
+    'neighborhood', 'Centro'
+  ),
+  'Engenheiro civil, 49 anos. Exposição solar ocupacional intensa. Múltiplas queratoses actínicas. Histórico familiar de melanoma.',
+  'SEU_DOCTOR_ID_AQUI'
+);
+*/
+
 -- Comentários para facilitar a manutenção
 COMMENT ON TABLE questions_bank IS 'Banco de perguntas pré-definidas e personalizadas';
 COMMENT ON COLUMN questions_bank.is_default IS 'Indica se a pergunta é padrão do sistema (true) ou personalizada pelo médico (false)';

@@ -109,13 +109,15 @@ function LoginForm() {
       <div className='absolute top-4 right-4'>
         <ThemeToggle />
       </div>
-      
+
       <Card className='w-full max-w-md'>
         <CardHeader className='space-y-1'>
           <div className='mb-4 flex items-center justify-center'>
             <div className='flex items-center space-x-2'>
               <Stethoscope className='h-8 w-8 text-blue-600' />
-              <span className='text-2xl font-bold text-gray-900 dark:text-white'>Vitalia</span>
+              <span className='text-2xl font-bold text-gray-900 dark:text-white'>
+                Vitalia
+              </span>
             </div>
           </div>
           <CardTitle className='text-center text-2xl'>Entrar</CardTitle>

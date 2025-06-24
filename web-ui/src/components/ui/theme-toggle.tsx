@@ -46,7 +46,7 @@ export function ThemeToggle() {
           <Sun className='h-4 w-4' />
           <span>Tema Claro</span>
           {theme === 'light' && (
-            <div className='ml-auto h-2 w-2 rounded-full bg-primary' />
+            <div className='bg-primary ml-auto h-2 w-2 rounded-full' />
           )}
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -56,7 +56,7 @@ export function ThemeToggle() {
           <Moon className='h-4 w-4' />
           <span>Tema Escuro</span>
           {theme === 'dark' && (
-            <div className='ml-auto h-2 w-2 rounded-full bg-primary' />
+            <div className='bg-primary ml-auto h-2 w-2 rounded-full' />
           )}
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -66,7 +66,7 @@ export function ThemeToggle() {
           <Monitor className='h-4 w-4' />
           <span>Sistema</span>
           {theme === 'system' && (
-            <div className='ml-auto h-2 w-2 rounded-full bg-primary' />
+            <div className='bg-primary ml-auto h-2 w-2 rounded-full' />
           )}
         </DropdownMenuItem>
       </DropdownMenuContent>

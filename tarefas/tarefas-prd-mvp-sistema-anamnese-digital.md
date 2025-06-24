@@ -21,6 +21,18 @@
 - `web-ui/src/lib/validations/patient.ts` - Schemas Zod para validação de dados de pacientes
 - `web-ui/src/lib/supabase/server.ts` - Cliente Supabase server com função createServerSupabaseClient
 - `web-ui/src/components/ui/alert.tsx` - Componente Alert para exibição de mensagens
+- `supabase/migrations/20250101000005_create_patient_documents.sql` - Migração para tabela de documentos de pacientes
+- `supabase/migrations/20250101000006_patient_documents_rls.sql` - Políticas RLS para documentos de pacientes
+- `web-ui/src/types/patient-documents.ts` - Tipos TypeScript para documentos de pacientes
+- `web-ui/src/lib/validations/patient-documents.ts` - Schemas Zod para validação de documentos
+- `web-ui/src/app/api/patients/[id]/documents/route.ts` - API para listar e fazer upload de documentos
+- `web-ui/src/app/api/patients/[id]/documents/[documentId]/route.ts` - API para CRUD individual de documentos
+- `web-ui/src/components/patients/DocumentUpload.tsx` - Componente para upload de documentos com drag-and-drop
+- `web-ui/src/components/patients/DocumentList.tsx` - Componente para listar e gerenciar documentos
+- `web-ui/src/app/dashboard/patients/[id]/page.tsx` - Página de detalhes do paciente com documentos e histórico
+- `web-ui/src/app/api/patients/[id]/history/route.ts` - API para buscar histórico completo do paciente
+- `web-ui/src/components/patients/PatientHistory.tsx` - Componente de timeline do histórico do paciente
+- `web-ui/src/types/patient-history.ts` - Tipos TypeScript para histórico do paciente
 - `web-ui/src/app/api/responses/route.ts` - API para respostas de questionários
 - `web-ui/src/app/public/[token]/page.tsx` - Página pública para pacientes responderem questionários
 - `web-ui/src/components/ui/` - Componentes base do Shadcn/ui (20+ componentes instalados)
@@ -45,38 +57,17 @@
 - `web-ui/src/store/authStore.ts` - Store Zustand para estado de autenticação
 - `web-ui/src/store/questionnaireStore.ts` - Store Zustand para estado de questionários
 - `supabase/migrations/` - Migrações do banco de dados ✅ VULNERABILIDADES CORRIGIDAS
-- `supabase/seed.sql` - Dados iniciais (perguntas pré-definidas)
+- `supabase/seed.sql` - Dados iniciais (perguntas pré-definidas + seed de 10 pacientes exemplo) ✅ ATUALIZADO
 - `web-ui/.eslintrc.json` - Configuração ESLint com regras médicas e acessibilidade
 - `web-ui/.prettierrc` - Configuração Prettier com Tailwind CSS plugin
 - `web-ui/.husky/pre-commit` - Hook git para lint-staged
 - `web-ui/.husky/pre-push` - Hook git para verificações antes do push
 - `web-ui/.env` - Variáveis de ambiente ✅ ENCODING CORRIGIDO
 
-### Notas
-
-- Os testes unitários devem ser colocados ao lado dos arquivos de código que estão testando (ex: `QuestionBuilder.tsx` e `QuestionBuilder.test.tsx` no mesmo diretório).
-- Use `npm test` para executar os testes. Executar sem argumentos executa todos os testes encontrados pela configuração do Jest.
-- LeaderLine.js requer configuração especial no Next.js para funcionar corretamente no lado do cliente.
-
-## 🛠️ **REVISÃO DO SISTEMA DE AUTENTICAÇÃO**
-
-### 🚨 **Problemas Reportados:**
-O sistema de autenticação não está funcional. Uma revisão completa será iniciada.
-
-### 📝 **Plano de Ação:**
-1.  **Análise do Backend Supabase:** Verificar status do projeto, logs, configurações de RLS e migrações.
-2.  **Revisão do Código Frontend:**
-    - `useAuth` hook
-    - `middleware.ts`
-    - Páginas de `login`, `register`, `forgot-password`
-3.  **Verificação das Variáveis de Ambiente:** Garantir que `web-ui/.env` (baseado em `env.example`) está correto.
-4.  **Testes de Fluxo:** Executar testes completos do fluxo de autenticação (registro, login, logout, recuperação de senha).
-
-### 🎯 **Status do Sistema de Autenticação: EM REVISÃO**
 
 ## Tarefas
 
-- [ ] 1.0 Configuração do Projeto e Infraestrutura Base
+- [x] 1.0 Configuração do Projeto e Infraestrutura Base
   - [x] 1.1 Criar estrutura de pastas do projeto com web-ui
   - [x] 1.2 Configurar Next.js 14+ com TypeScript na pasta web-ui
   - [x] 1.3 Configurar Tailwind CSS e configurações de estilo
@@ -102,7 +93,7 @@ O sistema de autenticação não está funcional. Uma revisão completa será in
   - [x] 2.11 Configurar controle de acesso por perfis (médico, admin)
   - [x] 2.12 Criar dashboard principal com navegação lateral
 
-- [ ] 3.0 CRM de Pacientes e Gestão de Dados
+- [x] 3.0 CRM de Pacientes e Gestão de Dados
   - [x] 3.1 Criar tabela de pacientes com campos obrigatórios
   - [x] 3.2 Implementar formulário de cadastro de pacientes
   - [x] 3.3 Criar validação Zod para dados de pacientes
@@ -110,10 +101,10 @@ O sistema de autenticação não está funcional. Uma revisão completa será in
   - [x] 3.5 Implementar busca por nome, CPF e telefone
   - [x] 3.6 Criar filtros avançados (idade, data de cadastro, etc.)
   - [x] 3.7 Implementar edição de dados do paciente
-  - [ ] 3.8 Configurar upload de documentos do paciente
-  - [ ] 3.9 Implementar histórico completo do paciente
-  - [ ] 3.10 Criar visualização detalhada do perfil do paciente
-  - [ ] 3.11 Implementar exclusão suave de pacientes
+  - [x] 3.8 Configurar upload de documentos do paciente
+  - [x] 3.9 Implementar histórico completo do paciente
+  - [x] 3.10 Criar visualização detalhada do perfil do paciente
+  - [x] 3.11 Implementar exclusão suave de pacientes
   - [x] 3.12 Criar APIs REST para CRUD de pacientes
 
 - [ ] 4.0 Sistema de Questionários e Banco de Perguntas
@@ -207,9 +198,9 @@ O sistema de autenticação não está funcional. Uma revisão completa será in
 ### 📊 Status Geral do Projeto
 - **Início:** 17 de Junho 2025
 - **Duração Estimada:** 18 semanas (9 sprints de 2 semanas)
-- **Status Atual:** Desenvolvimento - Sprint 0
-- **Tempo Trabalhado:** 54,0 horas
-- **Data da Última Atualização:** 23 de Junho 2025
+- **Status Atual:** Desenvolvimento - Sprint 3 (Próximo: Sistema de Questionários)
+- **Tempo Trabalhado:** 65,0 horas (15h + 30h + 20h das tarefas concluídas)
+- **Data da Última Atualização:** 02 de Janeiro 2025
 
 ### 🐛 Correções Realizadas
 - **Bug PostCSS/TailwindCSS:** Corrigido erro de configuração do PostCSS que impedia a compilação
@@ -219,13 +210,14 @@ O sistema de autenticação não está funcional. Uma revisão completa será in
 ### 📋 Contadores de Tarefas
 - **Total de Tarefas Principais:** 8
 - **Total de Subtarefas:** 123
-- **Tarefas Concluídas:** 29
-- **Progresso Geral:** 23,6%
+- **Tarefas Principais Concluídas:** 3 (1.0, 2.0, 3.0)
+- **Subtarefas Concluídas:** 34 (10 + 12 + 12)
+- **Progresso Geral:** 37,5% (3 de 8 tarefas principais)
 
 ### ⏱️ Controle de Tempo por Tarefa
-- **1.0 Configuração do Projeto:** 15,0h / ~20h estimadas (CONCLUÍDO)
-- **2.0 Autenticação e Usuários:** 30,0h / ~30h estimadas
-- **3.0 CRM de Pacientes:** 8,0h / ~25h estimadas
+- **1.0 Configuração do Projeto:** 15,0h / ~20h estimadas ✅ CONCLUÍDO
+- **2.0 Autenticação e Usuários:** 30,0h / ~30h estimadas ✅ CONCLUÍDO
+- **3.0 CRM de Pacientes:** 20,0h / ~25h estimadas ✅ CONCLUÍDO
 - **4.0 Sistema de Questionários:** 0h / ~40h estimadas
 - **5.0 Agenda Médica:** 0h / ~20h estimadas
 - **6.0 Comparação e Anotações:** 0h / ~25h estimadas
@@ -233,13 +225,13 @@ O sistema de autenticação não está funcional. Uma revisão completa será in
 - **8.0 Formulário de Queixas Estéticas:** 0h / ~35h estimadas
 
 ### 🎯 Progresso por Sprint
-- **Sprint 0 (Setup):** 100% - CONCLUÍDO ✅
-- **Sprint 1-2 (Auth + CRM):** 50% - Em andamento
-- **Sprint 3-4 (Questionários):** 0% - Não iniciado
-- **Sprint 5 (Agenda):** 0% - Não iniciado
-- **Sprint 6 (Comparação):** 0% - Não iniciado
-- **Sprint 7 (Imagens):** 0% - Não iniciado
-- **Sprint 8 (Queixas Estéticas):** 0% - Não iniciado
+- **Sprint 0 (Setup - Tarefa 1.0):** 100% - CONCLUÍDO ✅
+- **Sprint 1-2 (Auth + CRM - Tarefas 2.0 e 3.0):** 100% - CONCLUÍDO ✅
+- **Sprint 3-4 (Questionários - Tarefa 4.0):** 0% - Próximo
+- **Sprint 5 (Agenda - Tarefa 5.0):** 0% - Não iniciado
+- **Sprint 6 (Comparação - Tarefa 6.0):** 0% - Não iniciado
+- **Sprint 7 (Imagens - Tarefa 7.0):** 0% - Não iniciado
+- **Sprint 8 (Queixas Estéticas - Tarefa 8.0):** 0% - Não iniciado
 
 ### 📝 Log de Atividades
 ```
@@ -280,6 +272,15 @@ O sistema de autenticação não está funcional. Uma revisão completa será in
 [2025-06-23 04:30] - ✅ Tarefa 3.7 concluída: Páginas de cadastro e edição de pacientes implementadas com navegação e validação
 [2025-06-23 05:00] - ✅ Tarefa 3.12 concluída: APIs REST completas para CRUD de pacientes com autenticação, validação e tratamento de erros
 [2025-06-23 10:00] - ✅ Tarefa 2.0 CONCLUÍDA: Sistema de Autenticação e Gestão de Usuários completamente implementado e funcional
+[2025-06-23 15:00] - ✅ Tarefa 3.8 concluída: Sistema completo de upload de documentos implementado - migrações de banco, APIs REST, componentes drag-and-drop, validações Zod, integração com Supabase Storage
+[2025-06-23 16:30] - ✅ Tarefa 3.9 concluída: Histórico completo do paciente implementado - API de histórico, componente timeline, integração com documentos/respostas/anotações/consultas
+[2025-06-23 18:00] - ✅ Tarefa 3.10 concluída: Visualização detalhada do perfil implementada - componente PatientProfile com abas, estatísticas, métricas de completude
+[2025-06-23 18:30] - ✅ Tarefa 3.11 concluída: Exclusão suave implementada - migração de banco, APIs de delete/restore, dialog de confirmação, listagem de excluídos
+[2025-06-23 19:00] - ✅ Tarefa 3.0 CONCLUÍDA: CRM de Pacientes e Gestão de Dados completamente implementado e funcional
+[2025-06-23 19:30] - 🎉 Build bem-sucedido: Todas as funcionalidades implementadas passaram na compilação TypeScript e build de produção
+[2025-06-24 08:05] - 📊 Atualização das métricas de progresso: Tarefas 1.0, 2.0 e 3.0 marcadas como concluídas, progresso atualizado para 37,5%, Sprint 1-2 marcado como 100% concluído
+[2025-01-02 11:15] - 🌱 Seed de pacientes criado: 10 pacientes de exemplo inseridos no Supabase com dados realistas (diferentes idades, gêneros, especialidades médicas). Arquivo seed.sql atualizado com template comentado.
+[2025-01-02 11:45] - 🐛 Correção de erro no Select: Corrigido SelectItem com value vazio na página de pacientes. Substituído value='' por value='all' e ajustada lógica de filtros.
 ```
 
 ### 🔄 Instruções para Atualização

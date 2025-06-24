@@ -23,7 +23,7 @@ import { usePathname } from 'next/navigation'
 import * as React from 'react'
 import { toast } from 'sonner'
 
-import { SearchForm } from '@/components/ui/search-form'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -227,9 +227,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className='px-2 py-2'>
-          <SearchForm />
-        </div>
+
       </SidebarHeader>
 
       <SidebarContent>
