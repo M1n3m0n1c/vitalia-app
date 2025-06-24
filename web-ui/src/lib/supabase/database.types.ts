@@ -95,11 +95,11 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "patients_doctor_id_fkey"
-            columns: ["doctor_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
+            foreignKeyName: 'patients_doctor_id_fkey'
+            columns: ['doctor_id']
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
         ]
       }
       // Tabela de questionários
@@ -139,11 +139,11 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "questionnaires_doctor_id_fkey"
-            columns: ["doctor_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
+            foreignKeyName: 'questionnaires_doctor_id_fkey'
+            columns: ['doctor_id']
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
         ]
       }
       // Tabela de respostas
@@ -177,17 +177,17 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "responses_questionnaire_id_fkey"
-            columns: ["questionnaire_id"]
-            referencedRelation: "questionnaires"
-            referencedColumns: ["id"]
+            foreignKeyName: 'responses_questionnaire_id_fkey'
+            columns: ['questionnaire_id']
+            referencedRelation: 'questionnaires'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "responses_patient_id_fkey"
-            columns: ["patient_id"]
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          }
+            foreignKeyName: 'responses_patient_id_fkey'
+            columns: ['patient_id']
+            referencedRelation: 'patients'
+            referencedColumns: ['id']
+          },
         ]
       }
     }
@@ -210,15 +210,18 @@ export interface Database {
 // Tipos de conveniência para uso na aplicação
 export type User = Database['public']['Tables']['users']['Row']
 export type Patient = Database['public']['Tables']['patients']['Row']
-export type Questionnaire = Database['public']['Tables']['questionnaires']['Row']
+export type Questionnaire =
+  Database['public']['Tables']['questionnaires']['Row']
 export type Response = Database['public']['Tables']['responses']['Row']
 
 export type UserInsert = Database['public']['Tables']['users']['Insert']
 export type PatientInsert = Database['public']['Tables']['patients']['Insert']
-export type QuestionnaireInsert = Database['public']['Tables']['questionnaires']['Insert']
+export type QuestionnaireInsert =
+  Database['public']['Tables']['questionnaires']['Insert']
 export type ResponseInsert = Database['public']['Tables']['responses']['Insert']
 
 export type UserUpdate = Database['public']['Tables']['users']['Update']
 export type PatientUpdate = Database['public']['Tables']['patients']['Update']
-export type QuestionnaireUpdate = Database['public']['Tables']['questionnaires']['Update']
-export type ResponseUpdate = Database['public']['Tables']['responses']['Update'] 
+export type QuestionnaireUpdate =
+  Database['public']['Tables']['questionnaires']['Update']
+export type ResponseUpdate = Database['public']['Tables']['responses']['Update']

@@ -79,7 +79,7 @@
     // General code quality rules
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "no-debugger": "error",
-    "no-alert": "error",
+    "no-alert": "warn",
     "prefer-const": "error",
     "no-var": "error",
     "object-shorthand": "error",

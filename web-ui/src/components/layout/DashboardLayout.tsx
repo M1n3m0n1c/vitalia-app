@@ -1,24 +1,26 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { 
-  Calendar, 
-  FileText, 
-  Users, 
-  Image, 
-  BarChart3, 
-  Face, 
-  Menu, 
+import {
+  Calendar,
+  FileText,
+  Users,
+  ImageIcon,
+  BarChart3,
+  User,
+  Menu,
   X,
   LogOut,
   Settings,
-  Stethoscope
+  Stethoscope,
+  Home,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,13 +30,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '@/hooks/useAuth'
-import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 const navigation = [
   {
     name: 'Dashboard',
-    href: '/dashboard',
-    icon: BarChart3,
+    href: '/',
+    icon: Home,
   },
   {
     name: 'Pacientes',
@@ -54,7 +56,7 @@ const navigation = [
   {
     name: 'Imagens',
     href: '/images',
-    icon: Image,
+    icon: ImageIcon,
   },
   {
     name: 'Comparação',
@@ -64,7 +66,7 @@ const navigation = [
   {
     name: 'Queixas Estéticas',
     href: '/facial-complaints',
-    icon: Face,
+    icon: User,
   },
 ]
 
@@ -78,17 +80,21 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { profile, signOut, loading } = useAuth()
 
   const handleSignOut = async () => {
-    const result = await signOut()
-    if (result.success) {
-      toast.success('Logout realizado com sucesso!')
-    } else {
-      toast.error('Erro ao fazer logout', {
-        description: result.error,
-      })
+    try {
+      const result = await signOut()
+      if (result.success) {
+        toast.success('Logout realizado com sucesso!')
+      } else {
+        toast.error('Erro ao fazer logout', {
+          description: result.error,
+        })
+      }
+    } catch (error) {
+      toast.error('Erro inesperado ao fazer logout')
     }
   }
 
-  const getInitials = (name: string | null) => {
+  const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U'
     return name
       .split(' ')
@@ -100,60 +106,81 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className='flex min-h-screen items-center justify-center bg-gray-50'>
+        <div className='flex flex-col items-center space-y-4'>
+          <div className='h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent'></div>
+          <p className='text-muted-foreground text-sm'>Carregando...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar */}
-      <div className={cn(
-        "fixed inset-0 flex z-40 md:hidden",
-        sidebarOpen ? "block" : "hidden"
-      )}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
-          <div className="absolute top-0 right-0 -mr-12 pt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-              className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-            >
-              <X className="h-6 w-6 text-white" />
-            </Button>
+    <div className='min-h-screen bg-gray-50'>
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className='fixed inset-0 z-50 md:hidden'>
+          <div
+            className='bg-opacity-50 fixed inset-0 bg-black'
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className='relative flex h-full w-64 flex-col bg-white shadow-xl'>
+            <div className='flex items-center justify-between border-b p-4'>
+              <div className='flex items-center space-x-2'>
+                <Stethoscope className='h-8 w-8 text-blue-600' />
+                <span className='text-foreground text-xl font-bold'>
+                  Vitalia
+                </span>
+              </div>
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={() => setSidebarOpen(false)}
+              >
+                <X className='h-5 w-5' />
+              </Button>
+            </div>
+            <Sidebar />
+          </div>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <div className='hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col'>
+        <div className='bg-background flex min-h-0 flex-1 flex-col border border-r'>
+          <div className='flex h-16 items-center border border-b px-4'>
+            <div className='flex items-center space-x-2'>
+              <Stethoscope className='h-8 w-8 text-blue-600' />
+              <span className='text-foreground text-xl font-bold'>Vitalia</span>
+            </div>
           </div>
           <Sidebar />
         </div>
       </div>
 
-      {/* Static sidebar for desktop */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <Sidebar />
-      </div>
-
       {/* Main content */}
-      <div className="md:pl-64 flex flex-col flex-1">
-        {/* Top bar */}
-        <div className="sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-white shadow">
+      <div className='md:pl-64'>
+        {/* Mobile header */}
+        <div className='bg-background sticky top-0 z-40 flex h-16 items-center gap-x-4 border border-b px-4 md:hidden'>
           <Button
-            variant="ghost"
-            size="sm"
+            variant='ghost'
+            size='sm'
             onClick={() => setSidebarOpen(true)}
-            className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className='h-6 w-6' />
           </Button>
+          <div className='flex items-center space-x-2'>
+            <Stethoscope className='h-6 w-6 text-blue-600' />
+            <span className='text-foreground text-lg font-semibold'>
+              Vitalia
+            </span>
+          </div>
         </div>
 
         {/* Page content */}
-        <main className="flex-1">
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-              {children}
-            </div>
+        <main className='py-6'>
+          <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+            {children}
           </div>
         </main>
       </div>
@@ -162,79 +189,81 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   function Sidebar() {
     return (
-      <div className="flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white">
-        {/* Logo */}
-        <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-          <div className="flex items-center flex-shrink-0 px-4">
-            <div className="flex items-center space-x-2">
-              <Stethoscope className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">Vitalia</span>
-            </div>
-          </div>
+      <div className='flex flex-1 flex-col overflow-y-auto'>
+        {/* Navigation */}
+        <nav className='flex-1 space-y-1 p-4'>
+          {navigation.map(item => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/' && pathname.startsWith(item.href))
 
-          {/* Navigation */}
-          <nav className="mt-8 flex-1 px-2 space-y-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  'group flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'border-r-2 border-blue-600 bg-blue-50 text-blue-700'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                )}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <item.icon
                   className={cn(
+                    'mr-3 h-5 w-5 flex-shrink-0',
                     isActive
-                      ? 'bg-blue-100 border-blue-500 text-blue-700'
-                      : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    'group flex items-center px-2 py-2 text-sm font-medium rounded-md border-l-4 transition-colors'
+                      ? 'text-blue-600'
+                      : 'text-muted-foreground group-hover:text-foreground'
                   )}
-                >
-                  <item.icon
-                    className={cn(
-                      isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500',
-                      'mr-3 flex-shrink-0 h-6 w-6'
-                    )}
-                  />
-                  {item.name}
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
+                />
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
 
         {/* User profile */}
-        <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+        <div className='border border-t p-4'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start p-0 h-auto">
-                <div className="flex items-center w-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt={profile?.full_name || ''} />
-                    <AvatarFallback className="bg-blue-100 text-blue-600">
+              <Button
+                variant='ghost'
+                className='h-auto w-full justify-start p-0'
+              >
+                <div className='flex w-full items-center space-x-3'>
+                  <Avatar className='h-8 w-8'>
+                    <AvatarImage src='' alt='' />
+                    <AvatarFallback className='bg-blue-100 text-sm text-blue-600'>
                       {getInitials(profile?.full_name)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="ml-3 text-left flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 truncate">
+                  <div className='flex-1 text-left'>
+                    <p className='text-foreground truncate text-sm font-medium'>
                       {profile?.full_name || 'Usuário'}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className='text-muted-foreground truncate text-xs'>
                       {profile?.specialty || 'Médico'}
                     </p>
                   </div>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align='end' className='w-56'>
               <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/profile" className="flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
+                <Link href='/profile' className='flex items-center'>
+                  <Settings className='mr-2 h-4 w-4' />
                   Configurações
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className='text-red-600 focus:text-red-600'
+              >
+                <LogOut className='mr-2 h-4 w-4' />
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -243,4 +272,4 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
     )
   }
-} 
+}

@@ -13,16 +13,7 @@ web-ui/build/
 web-ui/dist/
 
 # Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-web-ui/.env
-web-ui/.env.local
-web-ui/.env.development.local
-web-ui/.env.test.local
-web-ui/.env.production.local
+
 
 # Supabase
 .supabase/

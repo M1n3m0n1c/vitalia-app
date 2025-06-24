@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { Eye, EyeOff, Stethoscope } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -26,6 +27,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import {
   Select,
   SelectContent,
@@ -33,44 +35,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
 
-const registerSchema = z.object({
-  fullName: z
-    .string()
-    .min(1, 'Nome completo é obrigatório')
-    .min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  email: z
-    .string()
-    .min(1, 'E-mail é obrigatório')
-    .email('E-mail inválido'),
-  password: z
-    .string()
-    .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter pelo menos 6 caracteres')
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Senha deve conter pelo menos uma letra minúscula, uma maiúscula e um número'
-    ),
-  confirmPassword: z
-    .string()
-    .min(1, 'Confirmação de senha é obrigatória'),
-  crm: z
-    .string()
-    .min(1, 'CRM é obrigatório')
-    .regex(/^\d{4,6}$/, 'CRM deve conter apenas números (4-6 dígitos)'),
-  specialty: z
-    .string()
-    .min(1, 'Especialidade é obrigatória'),
-  phone: z
-    .string()
-    .min(1, 'Telefone é obrigatório')
-    .regex(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, 'Formato: (11) 99999-9999'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Senhas não coincidem',
-  path: ['confirmPassword'],
-})
+const registerSchema = z
+  .object({
+    fullName: z
+      .string()
+      .min(1, 'Nome completo é obrigatório')
+      .min(2, 'Nome deve ter pelo menos 2 caracteres'),
+    email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
+    password: z
+      .string()
+      .min(1, 'Senha é obrigatória')
+      .min(6, 'Senha deve ter pelo menos 6 caracteres')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Senha deve conter pelo menos uma letra minúscula, uma maiúscula e um número'
+      ),
+    confirmPassword: z.string().min(1, 'Confirmação de senha é obrigatória'),
+    crm: z
+      .string()
+      .min(1, 'CRM é obrigatório')
+      .regex(/^\d{4,6}$/, 'CRM deve conter apenas números (4-6 dígitos)'),
+    specialty: z.string().min(1, 'Especialidade é obrigatória'),
+    phone: z
+      .string()
+      .min(1, 'Telefone é obrigatório')
+      .regex(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, 'Formato: (11) 99999-9999'),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: 'Senhas não coincidem',
+    path: ['confirmPassword'],
+  })
 
 type RegisterFormValues = z.infer<typeof registerSchema>
 
@@ -156,7 +152,7 @@ export default function RegisterPage() {
         toast.success('Conta criada com sucesso!', {
           description: 'Verifique seu e-mail para confirmar sua conta.',
         })
-        
+
         router.push('/login')
       }
     } catch (error) {
@@ -178,32 +174,37 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <div className="flex items-center space-x-2">
-              <Stethoscope className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">Vitalia</span>
+    <div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4 dark:from-gray-900 dark:to-gray-800'>
+      {/* Theme Toggle */}
+      <div className='absolute top-4 right-4'>
+        <ThemeToggle />
+      </div>
+      
+      <Card className='w-full max-w-md'>
+        <CardHeader className='space-y-1'>
+          <div className='mb-4 flex items-center justify-center'>
+            <div className='flex items-center space-x-2'>
+              <Stethoscope className='h-8 w-8 text-blue-600' />
+              <span className='text-2xl font-bold text-gray-900 dark:text-white'>Vitalia</span>
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Criar conta</CardTitle>
-          <CardDescription className="text-center">
-            Cadastre-se para começar a usar o sistema
+          <CardTitle className='text-center text-2xl'>Criar Conta</CardTitle>
+          <CardDescription className='text-center'>
+            Crie sua conta para começar a usar o sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
               <FormField
                 control={form.control}
-                name="fullName"
+                name='fullName'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nome completo</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Dr. João Silva"
+                        placeholder='Dr. João Silva'
                         disabled={isLoading}
                         {...field}
                       />
@@ -212,20 +213,20 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              
-              <div className="grid grid-cols-2 gap-4">
+
+              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
-                  name="crm"
+                  name='crm'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>CRM</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="123456"
+                          placeholder='123456'
                           disabled={isLoading}
                           {...field}
-                          onChange={(e) => {
+                          onChange={e => {
                             const value = e.target.value.replace(/\D/g, '')
                             field.onChange(value)
                           }}
@@ -235,10 +236,10 @@ export default function RegisterPage() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
-                  name="specialty"
+                  name='specialty'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Especialidade</FormLabel>
@@ -249,11 +250,11 @@ export default function RegisterPage() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione" />
+                            <SelectValue placeholder='Selecione' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {specialties.map((specialty) => (
+                          {specialties.map(specialty => (
                             <SelectItem key={specialty} value={specialty}>
                               {specialty}
                             </SelectItem>
@@ -268,16 +269,16 @@ export default function RegisterPage() {
 
               <FormField
                 control={form.control}
-                name="phone"
+                name='phone'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="(11) 99999-9999"
+                        placeholder='(11) 99999-9999'
                         disabled={isLoading}
                         {...field}
-                        onChange={(e) => {
+                        onChange={e => {
                           const formatted = formatPhone(e.target.value)
                           field.onChange(formatted)
                         }}
@@ -290,15 +291,15 @@ export default function RegisterPage() {
 
               <FormField
                 control={form.control}
-                name="email"
+                name='email'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>E-mail</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="seu@email.com"
-                        type="email"
-                        autoComplete="email"
+                        placeholder='seu@email.com'
+                        type='email'
+                        autoComplete='email'
                         disabled={isLoading}
                         {...field}
                       />
@@ -310,31 +311,31 @@ export default function RegisterPage() {
 
               <FormField
                 control={form.control}
-                name="password"
+                name='password'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
                     <FormControl>
-                      <div className="relative">
+                      <div className='relative'>
                         <Input
-                          placeholder="Sua senha"
+                          placeholder='Sua senha'
                           type={showPassword ? 'text' : 'password'}
-                          autoComplete="new-password"
+                          autoComplete='new-password'
                           disabled={isLoading}
                           {...field}
                         />
                         <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          className='absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent'
                           onClick={() => setShowPassword(!showPassword)}
                           disabled={isLoading}
                         >
                           {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
+                            <EyeOff className='h-4 w-4' />
                           ) : (
-                            <Eye className="h-4 w-4" />
+                            <Eye className='h-4 w-4' />
                           )}
                         </Button>
                       </div>
@@ -346,31 +347,33 @@ export default function RegisterPage() {
 
               <FormField
                 control={form.control}
-                name="confirmPassword"
+                name='confirmPassword'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirmar senha</FormLabel>
                     <FormControl>
-                      <div className="relative">
+                      <div className='relative'>
                         <Input
-                          placeholder="Confirme sua senha"
+                          placeholder='Confirme sua senha'
                           type={showConfirmPassword ? 'text' : 'password'}
-                          autoComplete="new-password"
+                          autoComplete='new-password'
                           disabled={isLoading}
                           {...field}
                         />
                         <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          className='absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent'
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           disabled={isLoading}
                         >
                           {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" />
+                            <EyeOff className='h-4 w-4' />
                           ) : (
-                            <Eye className="h-4 w-4" />
+                            <Eye className='h-4 w-4' />
                           )}
                         </Button>
                       </div>
@@ -380,22 +383,18 @@ export default function RegisterPage() {
                 )}
               />
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type='submit' className='w-full' disabled={isLoading}>
                 {isLoading ? 'Criando conta...' : 'Criar conta'}
               </Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter>
-          <div className="text-sm text-center text-gray-600 w-full">
+          <div className='w-full text-center text-sm text-gray-600'>
             Já tem uma conta?{' '}
             <Link
-              href="/login"
-              className="text-blue-600 hover:underline font-medium"
+              href='/login'
+              className='font-medium text-blue-600 hover:underline'
             >
               Faça login
             </Link>
@@ -404,4 +403,4 @@ export default function RegisterPage() {
       </Card>
     </div>
   )
-} 
+}

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { ArrowLeft, Stethoscope } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -25,14 +26,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase/client'
 
 const forgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'E-mail é obrigatório')
-    .email('E-mail inválido'),
+  email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
 })
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
@@ -78,42 +75,46 @@ export default function ForgotPasswordPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center justify-center mb-4">
-              <div className="flex items-center space-x-2">
-                <Stethoscope className="h-8 w-8 text-blue-600" />
-                <span className="text-2xl font-bold text-gray-900">Vitalia</span>
+      <div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4'>
+        <Card className='w-full max-w-md'>
+          <CardHeader className='space-y-1'>
+            <div className='mb-4 flex items-center justify-center'>
+              <div className='flex items-center space-x-2'>
+                <Stethoscope className='h-8 w-8 text-blue-600' />
+                <span className='text-2xl font-bold text-gray-900'>
+                  Vitalia
+                </span>
               </div>
             </div>
-            <CardTitle className="text-2xl text-center">E-mail enviado</CardTitle>
-            <CardDescription className="text-center">
+            <CardTitle className='text-center text-2xl'>
+              E-mail enviado
+            </CardTitle>
+            <CardDescription className='text-center'>
               Verifique sua caixa de entrada para continuar
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-sm text-gray-600 mb-4">
+          <CardContent className='text-center'>
+            <p className='mb-4 text-sm text-gray-600'>
               Enviamos um link de redefinição de senha para{' '}
-              <span className="font-medium">{form.getValues('email')}</span>
+              <span className='font-medium'>{form.getValues('email')}</span>
             </p>
-            <p className="text-xs text-gray-500">
+            <p className='text-xs text-gray-500'>
               Não recebeu o e-mail? Verifique sua pasta de spam ou{' '}
               <button
                 onClick={() => setEmailSent(false)}
-                className="text-blue-600 hover:underline font-medium"
+                className='font-medium text-blue-600 hover:underline'
               >
                 tente novamente
               </button>
             </p>
           </CardContent>
           <CardFooter>
-            <div className="text-sm text-center text-gray-600 w-full">
+            <div className='w-full text-center text-sm text-gray-600'>
               <Link
-                href="/login"
-                className="text-blue-600 hover:underline font-medium flex items-center justify-center"
+                href='/login'
+                className='flex items-center justify-center font-medium text-blue-600 hover:underline'
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className='mr-2 h-4 w-4' />
                 Voltar para o login
               </Link>
             </div>
@@ -124,34 +125,36 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <div className="flex items-center space-x-2">
-              <Stethoscope className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">Vitalia</span>
+    <div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4'>
+      <Card className='w-full max-w-md'>
+        <CardHeader className='space-y-1'>
+          <div className='mb-4 flex items-center justify-center'>
+            <div className='flex items-center space-x-2'>
+              <Stethoscope className='h-8 w-8 text-blue-600' />
+              <span className='text-2xl font-bold text-gray-900'>Vitalia</span>
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Esqueceu sua senha?</CardTitle>
-          <CardDescription className="text-center">
+          <CardTitle className='text-center text-2xl'>
+            Esqueceu sua senha?
+          </CardTitle>
+          <CardDescription className='text-center'>
             Digite seu e-mail para receber um link de redefinição
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
               <FormField
                 control={form.control}
-                name="email"
+                name='email'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>E-mail</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="seu@email.com"
-                        type="email"
-                        autoComplete="email"
+                        placeholder='seu@email.com'
+                        type='email'
+                        autoComplete='email'
                         disabled={isLoading}
                         {...field}
                       />
@@ -160,23 +163,19 @@ export default function ForgotPasswordPage() {
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type='submit' className='w-full' disabled={isLoading}>
                 {isLoading ? 'Enviando...' : 'Enviar link de redefinição'}
               </Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter>
-          <div className="text-sm text-center text-gray-600 w-full">
+          <div className='w-full text-center text-sm text-gray-600'>
             <Link
-              href="/login"
-              className="text-blue-600 hover:underline font-medium flex items-center justify-center"
+              href='/login'
+              className='flex items-center justify-center font-medium text-blue-600 hover:underline'
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className='mr-2 h-4 w-4' />
               Voltar para o login
             </Link>
           </div>
@@ -184,4 +183,4 @@ export default function ForgotPasswordPage() {
       </Card>
     </div>
   )
-} 
+}
