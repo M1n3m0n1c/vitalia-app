@@ -42,6 +42,7 @@ import {
   type HistoryItemType,
   type HistoryResponse,
 } from '@/types/patient-history'
+import { formatDateBrasilia } from '@/lib/utils/date'
 
 interface PatientHistoryProps {
   patientId: string
@@ -111,12 +112,6 @@ export function PatientHistory({
     setExpandedItems(newExpanded)
   }
 
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "dd/MM/yyyy 'às' HH:mm", {
-      locale: ptBR,
-    })
-  }
-
   const formatRelativeDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
@@ -164,7 +159,7 @@ export function PatientHistory({
                     </h3>
                     <div className='mt-1 flex items-center gap-2 text-sm text-gray-500'>
                       <Clock className='h-4 w-4' />
-                      <span>{formatDate(item.date)}</span>
+                      <span>{formatDateBrasilia(item.date, { dateStyle: 'short', timeStyle: 'short' })}</span>
                       <span>•</span>
                       <span>{formatRelativeDate(item.date)}</span>
                     </div>

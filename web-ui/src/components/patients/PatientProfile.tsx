@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { formatDateBrasilia } from '@/lib/utils/date'
 
 interface PatientProfileProps {
   patient: any
@@ -38,16 +39,6 @@ interface PatientProfileProps {
 }
 
 export function PatientProfile({ patient, stats }: PatientProfileProps) {
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "dd 'de' MMMM 'de' yyyy", {
-      locale: ptBR,
-    })
-  }
-
-  const formatDateShort = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR })
-  }
-
   const calculateAge = (birthDate: string) => {
     const today = new Date()
     const birth = new Date(birthDate)
@@ -149,7 +140,7 @@ export function PatientProfile({ patient, stats }: PatientProfileProps) {
                 {stats?.lastActivity && (
                   <div className='flex items-center gap-1'>
                     <Activity className='h-4 w-4' />
-                    Última atividade: {formatDateShort(stats.lastActivity)}
+                    Última atividade: {formatDateBrasilia(stats.lastActivity, { dateStyle: 'short' })}
                   </div>
                 )}
               </div>
@@ -238,7 +229,7 @@ export function PatientProfile({ patient, stats }: PatientProfileProps) {
                       Data de Nascimento
                     </div>
                     <p className='text-gray-900'>
-                      {formatDate(patient.birth_date)}
+                      {formatDateBrasilia(patient.birth_date, { dateStyle: 'long' })}
                     </p>
                   </div>
                 )}
@@ -287,13 +278,13 @@ export function PatientProfile({ patient, stats }: PatientProfileProps) {
                   <div className='flex items-center justify-between text-sm'>
                     <span className='text-gray-500'>Cadastrado em</span>
                     <span className='text-gray-900'>
-                      {formatDateShort(patient.created_at)}
+                      {formatDateBrasilia(patient.created_at, { dateStyle: 'short' })}
                     </span>
                   </div>
                   <div className='flex items-center justify-between text-sm'>
                     <span className='text-gray-500'>Última atualização</span>
                     <span className='text-gray-900'>
-                      {formatDateShort(patient.updated_at)}
+                      {formatDateBrasilia(patient.updated_at, { dateStyle: 'short' })}
                     </span>
                   </div>
                 </div>
@@ -449,7 +440,7 @@ export function PatientProfile({ patient, stats }: PatientProfileProps) {
                     Data de Criação
                   </label>
                   <p className='text-gray-900'>
-                    {formatDate(patient.created_at)}
+                    {formatDateBrasilia(patient.created_at)}
                   </p>
                 </div>
 
@@ -458,7 +449,7 @@ export function PatientProfile({ patient, stats }: PatientProfileProps) {
                     Última Modificação
                   </label>
                   <p className='text-gray-900'>
-                    {formatDate(patient.updated_at)}
+                    {formatDateBrasilia(patient.updated_at)}
                   </p>
                 </div>
               </div>

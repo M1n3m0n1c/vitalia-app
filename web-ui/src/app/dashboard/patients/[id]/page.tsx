@@ -9,6 +9,7 @@ import {
   MapPin,
   Phone,
   User,
+  Copy,
 } from 'lucide-react'
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
@@ -19,10 +20,17 @@ import { DeletePatientDialog } from '@/components/patients/DeletePatientDialog'
 import { DocumentList } from '@/components/patients/DocumentList'
 import { PatientHistory } from '@/components/patients/PatientHistory'
 import { PatientProfile } from '@/components/patients/PatientProfile'
+import { QuestionnaireSelectModal } from '@/components/form/QuestionnaireSelectModal'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { formatDateBrasilia } from '@/lib/utils/date'
 
 interface PatientDetailsPageProps {
   params: Promise<{ id: string }>
 }
+
+'use client'
+import { useState } from 'react'
 
 export default async function PatientDetailsPage({
   params,
@@ -137,6 +145,27 @@ export default async function PatientDetailsPage({
     return labels[gender as keyof typeof labels] || gender
   }
 
+  const [selectingQuestionnaire, setSelectingQuestionnaire] = useState(false)
+  const [successLink, setSuccessLink] = useState<string | null>(null)
+
+  const handleGeneratePublicLink = async (questionnaireId: string) => {
+    try {
+      const response = await fetch(`/api/questionnaires/${questionnaireId}/public-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ patient_id: patient.id })
+      })
+      const data = await response.json()
+      if (response.ok && data.data) {
+        setSuccessLink(window.location.origin + '/public/' + data.data)
+      } else {
+        alert(data.error || 'Erro ao gerar link público')
+      }
+    } catch (error) {
+      alert('Erro ao gerar link público')
+    }
+  }
+
   return (
     <div className='container mx-auto space-y-6 p-6'>
       {/* Header */}
@@ -226,7 +255,7 @@ export default async function PatientDetailsPage({
                     </label>
                     <p className='flex items-center gap-2 text-gray-900'>
                       <Calendar className='h-4 w-4' />
-                      {formatDate(patient.birth_date)} (
+                      {formatDateBrasilia(patient.birth_date)} (
                       {calculateAge(patient.birth_date)} anos)
                     </p>
                   </div>
@@ -315,7 +344,7 @@ export default async function PatientDetailsPage({
                   Cadastrado em
                 </label>
                 <p className='text-gray-900'>
-                  {formatDate(patient.created_at)}
+                  {formatDateBrasilia(patient.created_at)}
                 </p>
               </div>
 
@@ -324,7 +353,7 @@ export default async function PatientDetailsPage({
                   Última atualização
                 </label>
                 <p className='text-gray-900'>
-                  {formatDate(patient.updated_at)}
+                  {formatDateBrasilia(patient.updated_at)}
                 </p>
               </div>
 
@@ -366,10 +395,38 @@ export default async function PatientDetailsPage({
                 <Activity className='mr-2 h-4 w-4' />
                 Ver Histórico
               </Button>
+
+              <Button variant="secondary" onClick={() => setSelectingQuestionnaire(true)}>
+                <Copy className="h-4 w-4 mr-2" />
+                Gerar link de questionário
+              </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Modal de seleção de questionário */}
+      <QuestionnaireSelectModal
+        open={selectingQuestionnaire}
+        onClose={() => setSelectingQuestionnaire(false)}
+        onSelect={questionnaire => {
+          handleGeneratePublicLink(questionnaire.id)
+          setSelectingQuestionnaire(false)
+        }}
+      />
+
+      {/* Modal de sucesso com link gerado */}
+      <Dialog open={!!successLink} onOpenChange={() => setSuccessLink(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Link público gerado!</DialogTitle>
+          </DialogHeader>
+          <Input value={successLink || ''} readOnly className="mb-4 text-xs" />
+          <Button onClick={() => { navigator.clipboard.writeText(successLink || ''); alert('Link copiado!') }}>
+            <Copy className="h-4 w-4 mr-2" /> Copiar link
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

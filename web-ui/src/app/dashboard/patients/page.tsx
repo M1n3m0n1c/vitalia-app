@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatCpf, formatPhone } from '@/lib/validations/patient'
+import { formatDateBrasilia } from '@/lib/utils/date'
 
 interface Patient {
   id: string
@@ -386,9 +387,7 @@ export default function PatientsPage() {
                       <Calendar className='h-4 w-4' />
                       <span>
                         Cadastrado em{' '}
-                        {new Date(patient.created_at).toLocaleDateString(
-                          'pt-BR'
-                        )}
+                        {formatDateBrasilia(patient.created_at)}
                       </span>
                     </div>
 

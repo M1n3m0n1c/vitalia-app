@@ -54,6 +54,7 @@ import {
 } from '@/types/patient-documents'
 import { formatFileSize } from '@/lib/utils/storage'
 import { DocumentUpload } from './DocumentUpload'
+import { formatDateBrasilia } from '@/lib/utils/date'
 
 interface DocumentListProps {
   patientId: string
@@ -312,7 +313,7 @@ export function DocumentList({ patientId, patientName }: DocumentListProps) {
 
                       <div className='mt-2 flex items-center gap-4 text-xs text-gray-500'>
                         <span>{formatFileSize(document.file_size)}</span>
-                        <span>{formatDate(document.created_at)}</span>
+                        <span>{formatDateBrasilia(document.created_at)}</span>
                         <span>{document.original_name}</span>
                       </div>
 
