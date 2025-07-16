@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       appointments: {
@@ -210,7 +215,7 @@ export type Database = {
             foreignKeyName: "medical_notes_response_id_fkey"
             columns: ["response_id"]
             isOneToOne: false
-            referencedRelation: "responses"
+            referencedRelation: "questionnaire_responses"
             referencedColumns: ["id"]
           },
         ]
@@ -421,6 +426,61 @@ export type Database = {
           },
         ]
       }
+      questionnaire_responses: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          patient_id: string
+          public_link_id: string | null
+          questionnaire_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          answers: Json
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id: string
+          public_link_id?: string | null
+          questionnaire_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          patient_id?: string
+          public_link_id?: string | null
+          questionnaire_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questionnaire_responses_public_link_id_fkey"
+            columns: ["public_link_id"]
+            isOneToOne: false
+            referencedRelation: "public_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_questionnaire_id_fkey"
+            columns: ["questionnaire_id"]
+            isOneToOne: false
+            referencedRelation: "questionnaires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questionnaires: {
         Row: {
           category: string | null
@@ -515,51 +575,6 @@ export type Database = {
           },
         ]
       }
-      responses: {
-        Row: {
-          answers: Json
-          completed_at: string | null
-          created_at: string | null
-          id: string
-          patient_id: string
-          questionnaire_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          answers: Json
-          completed_at?: string | null
-          created_at?: string | null
-          id?: string
-          patient_id: string
-          questionnaire_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          answers?: Json
-          completed_at?: string | null
-          created_at?: string | null
-          id?: string
-          patient_id?: string
-          questionnaire_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "responses_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "responses_questionnaire_id_fkey"
-            columns: ["questionnaire_id"]
-            isOneToOne: false
-            referencedRelation: "questionnaires"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       users: {
         Row: {
           created_at: string | null
@@ -650,6 +665,8 @@ export type Database = {
         | "file"
         | "yes_no"
         | "slider"
+        | "facial_complaints"
+        | "body_complaints"
       user_role: "doctor" | "admin"
     }
     CompositeTypes: {
@@ -658,21 +675,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -690,14 +711,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -713,14 +736,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -736,14 +761,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -751,14 +778,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
@@ -801,6 +830,8 @@ export const Constants = {
         "file",
         "yes_no",
         "slider",
+        "facial_complaints",
+        "body_complaints",
       ],
       user_role: ["doctor", "admin"],
     },
@@ -808,38 +839,9 @@ export const Constants = {
 } as const
 
 // Tipos de conveniência para melhor DX
-export type User = Database['public']['Tables']['users']['Row']
-export type Patient = Database['public']['Tables']['patients']['Row']
-export type Questionnaire = Database['public']['Tables']['questionnaires']['Row']
-export type Response = Database['public']['Tables']['responses']['Row']
-export type Appointment = Database['public']['Tables']['appointments']['Row']
-
-export type UserInsert = Database['public']['Tables']['users']['Insert']
-export type PatientInsert = Database['public']['Tables']['patients']['Insert']
-export type QuestionnaireInsert = Database['public']['Tables']['questionnaires']['Insert']
-export type ResponseInsert = Database['public']['Tables']['responses']['Insert']
-export type AppointmentInsert = Database['public']['Tables']['appointments']['Insert']
-
-export type UserUpdate = Database['public']['Tables']['users']['Update']
-export type PatientUpdate = Database['public']['Tables']['patients']['Update']
-export type QuestionnaireUpdate = Database['public']['Tables']['questionnaires']['Update']
-export type ResponseUpdate = Database['public']['Tables']['responses']['Update']
-export type AppointmentUpdate = Database['public']['Tables']['appointments']['Update']
-
-export type QuestionBank = Database['public']['Tables']['questions_bank']['Row']
-export type QuestionBankInsert = Database['public']['Tables']['questions_bank']['Insert']
-export type QuestionBankUpdate = Database['public']['Tables']['questions_bank']['Update']
-
-export type MedicalNote = Database['public']['Tables']['medical_notes']['Row']
-export type MedicalNoteInsert = Database['public']['Tables']['medical_notes']['Insert']
-export type MedicalNoteUpdate = Database['public']['Tables']['medical_notes']['Update']
-
-export type PublicLink = Database['public']['Tables']['public_links']['Row']
-export type PublicLinkInsert = Database['public']['Tables']['public_links']['Insert']
-export type PublicLinkUpdate = Database['public']['Tables']['public_links']['Update']
-
 export type QuestionType = Database['public']['Enums']['question_type']
 export type UserRole = Database['public']['Enums']['user_role']
 export type Gender = Database['public']['Enums']['gender']
+export type DocumentType = Database['public']['Enums']['document_type']
 export type AppointmentStatus = Database['public']['Enums']['appointment_status']
 export type AppointmentType = Database['public']['Enums']['appointment_type']

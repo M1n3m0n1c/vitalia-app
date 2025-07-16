@@ -8,6 +8,8 @@ import { SliderQuestion } from './questions/SliderQuestion'
 import { DateQuestion } from './questions/DateQuestion'
 import { FileQuestion } from './questions/FileQuestion'
 import { YesNoQuestion } from './questions/YesNoQuestion'
+import { FacialComplaintsQuestion } from './questions/FacialComplaintsQuestion'
+import { BodyComplaintsQuestion } from './questions/BodyComplaintsQuestion'
 
 interface QuestionRendererProps {
   question: Question
@@ -59,6 +61,22 @@ export function QuestionRenderer({
       
       case 'yes_no':
         return <YesNoQuestion {...commonProps} question={question as any} value={value as any} />
+      
+      case 'facial_complaints':
+        return <FacialComplaintsQuestion 
+          question={question as any} 
+          value={(value as any)?.value || []} 
+          onChange={(newValue) => onChange({ question_type: 'facial_complaints', value: newValue })}
+          error={error}
+        />
+      
+      case 'body_complaints':
+        return <BodyComplaintsQuestion 
+          question={question as any} 
+          value={(value as any)?.value || []} 
+          onChange={(newValue) => onChange({ question_type: 'body_complaints', value: newValue })}
+          error={error}
+        />
       
       default:
         return (

@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Question, MEDICAL_SPECIALTIES } from '@/types/questionnaire'
 import { useQuestionnaireBuilderStore } from '@/store/questionnaireBuilderStore'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { NewQuestionModal } from '@/components/form/NewQuestionModal'
 
 interface QuestionBankItem {
   id: string
@@ -44,7 +45,9 @@ const QUESTION_TYPES = [
   { value: 'slider', label: 'Escala Visual' },
   { value: 'date', label: 'Data' },
   { value: 'file', label: 'Upload de Arquivo' },
-  { value: 'yes_no', label: 'Sim/Não/Não Sei' }
+  { value: 'yes_no', label: 'Sim/Não/Não Sei' },
+  { value: 'facial_complaints', label: 'Queixas Faciais' },
+  { value: 'body_complaints', label: 'Queixas Corporais' }
 ]
 
 export default function QuestionBankPage() {
@@ -181,15 +184,24 @@ export default function QuestionBankPage() {
       </div>
 
       {/* Modal de Nova Pergunta */}
-      <Dialog open={showNewQuestion} onOpenChange={setShowNewQuestion}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Nova Pergunta</DialogTitle>
-          </DialogHeader>
-          {/* Formulário será implementado aqui */}
-          <div className="text-muted-foreground text-center py-8">Formulário de cadastro em breve...</div>
-        </DialogContent>
-      </Dialog>
+      {showNewQuestion && (
+        <NewQuestionModal
+          onClose={() => setShowNewQuestion(false)}
+          onAddQuestion={(question: Question) => {
+            // Adicionar pergunta criada ao banco local
+            const newBankItem: QuestionBankItem = {
+              id: question.id,
+              question_text: question.question_text,
+              question_type: question.question_type,
+              category: undefined,
+              specialty: undefined,
+              options: (question as any).options
+            }
+            setQuestions(prev => [newBankItem, ...prev])
+            setShowNewQuestion(false)
+          }}
+        />
+      )}
 
       {/* Filters */}
       <div className="space-y-6 border-b pb-6 px-2">

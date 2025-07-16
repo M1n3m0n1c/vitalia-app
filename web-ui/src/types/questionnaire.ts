@@ -77,6 +77,14 @@ export interface YesNoQuestion extends BaseQuestion {
   }
 }
 
+export interface FacialComplaintsQuestion extends BaseQuestion {
+  question_type: 'facial_complaints'
+}
+
+export interface BodyComplaintsQuestion extends BaseQuestion {
+  question_type: 'body_complaints'
+}
+
 // Union type para todos os tipos de perguntas
 export type Question = 
   | TextQuestion 
@@ -87,6 +95,8 @@ export type Question =
   | DateQuestion 
   | FileQuestion 
   | YesNoQuestion
+  | FacialComplaintsQuestion
+  | BodyComplaintsQuestion
 
 // Tipos para respostas
 export interface BaseAnswer {
@@ -139,6 +149,16 @@ export interface YesNoAnswer extends BaseAnswer {
   value: 'yes' | 'no' | 'unknown'
 }
 
+export interface FacialComplaintsAnswer {
+  question_type: 'facial_complaints'
+  value: string[]
+}
+
+export interface BodyComplaintsAnswer {
+  question_type: 'body_complaints'
+  value: string[]
+}
+
 // Union type para todas as respostas
 export type Answer = 
   | TextAnswer 
@@ -149,6 +169,8 @@ export type Answer =
   | DateAnswer 
   | FileAnswer 
   | YesNoAnswer
+  | FacialComplaintsAnswer
+  | BodyComplaintsAnswer
 
 // Tipos para questionário completo
 export interface QuestionnaireData {

@@ -41,7 +41,19 @@ export default function QuestionnaireBuilderPage() {
   })
   const [showPreview, setShowPreview] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const { questions, setQuestions } = useQuestionnaireBuilderStore()
+  const { questions, setQuestions, clearQuestions } = useQuestionnaireBuilderStore()
+  
+  // Hidratar o store do localStorage
+  useEffect(() => {
+    useQuestionnaireBuilderStore.persist.rehydrate()
+  }, [])
+  
+  // Limpar o store ao iniciar um novo questionário
+  useEffect(() => {
+    if (!questionnaireId) {
+      clearQuestions()
+    }
+  }, [questionnaireId, clearQuestions])
 
   useEffect(() => {
     if (!questionnaireId) return
@@ -89,6 +101,14 @@ export default function QuestionnaireBuilderPage() {
       questions
     }))
   }
+
+  // Sincronizar o estado local com o store
+  useEffect(() => {
+    setQuestionnaire(prev => ({
+      ...prev,
+      questions
+    }))
+  }, [questions])
 
   const handleSave = async () => {
     if (!questionnaire.title.trim()) {
@@ -143,6 +163,7 @@ export default function QuestionnaireBuilderPage() {
 
       if (response.ok) {
         toast.success('Questionário salvo com sucesso!')
+        clearQuestions() // Limpar o store após salvar
         router.push('/dashboard/questionnaires')
       } else {
         toast.error(result.error || 'Erro ao salvar questionário')

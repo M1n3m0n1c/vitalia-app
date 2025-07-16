@@ -33,6 +33,7 @@ import { NewQuestionModal } from './NewQuestionModal'
 import { QuestionnairePreview } from './QuestionnairePreview'
 import { QuestionnaireData } from '@/types/questionnaire'
 import { useRouter } from 'next/navigation'
+import { useQuestionnaireBuilderStore } from '@/store/questionnaireBuilderStore'
 
 interface QuestionnaireBuilderProps {
   questions: Question[]
@@ -54,15 +55,19 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
   )
 
   const router = useRouter()
+  const { questions: storeQuestions } = useQuestionnaireBuilderStore()
+  
+  // Usar as perguntas do store se disponíveis, senão usar as props
+  const actualQuestions = storeQuestions.length > 0 ? storeQuestions : questions
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
     if (over && active.id !== over.id) {
-      const oldIndex = questions.findIndex((q) => q.id === active.id)
-      const newIndex = questions.findIndex((q) => q.id === over.id)
+      const oldIndex = actualQuestions.findIndex((q) => q.id === active.id)
+      const newIndex = actualQuestions.findIndex((q) => q.id === over.id)
 
-      const reorderedQuestions = arrayMove(questions, oldIndex, newIndex).map((q, index) => ({
+      const reorderedQuestions = arrayMove(actualQuestions, oldIndex, newIndex).map((q, index) => ({
         ...q,
         order: index
       }))
@@ -76,15 +81,15 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
     const newQuestion = {
       ...question,
       id: `question_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      order: questions.length
+      order: actualQuestions.length
     }
     
-    onQuestionsChange([...questions, newQuestion])
+    onQuestionsChange([...actualQuestions, newQuestion])
     toast.success('Pergunta adicionada!')
   }
 
   const handleUpdateQuestion = (questionId: string, updatedQuestion: Partial<Question>) => {
-    const updatedQuestions = questions.map(q =>
+    const updatedQuestions = actualQuestions.map(q =>
       q.id === questionId ? { ...q, ...updatedQuestion } as Question : q
     )
     onQuestionsChange(updatedQuestions)
@@ -92,7 +97,7 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
   }
 
   const handleDeleteQuestion = (questionId: string) => {
-    const filteredQuestions = questions
+    const filteredQuestions = actualQuestions
       .filter(q => q.id !== questionId)
       .map((q, index) => ({ ...q, order: index }))
     
@@ -101,16 +106,16 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
   }
 
   const handleDuplicateQuestion = (questionId: string) => {
-    const questionToDuplicate = questions.find(q => q.id === questionId)
+    const questionToDuplicate = actualQuestions.find(q => q.id === questionId)
     if (questionToDuplicate) {
       const duplicatedQuestion = {
         ...questionToDuplicate,
         id: `question_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         question_text: `${questionToDuplicate.question_text} (Cópia)`,
-        order: questions.length
+        order: actualQuestions.length
       }
       
-      onQuestionsChange([...questions, duplicatedQuestion])
+      onQuestionsChange([...actualQuestions, duplicatedQuestion])
       toast.success('Pergunta duplicada!')
     }
   }
@@ -150,7 +155,7 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {questions.length === 0 ? (
+          {actualQuestions.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed border-muted-foreground/25 rounded-lg">
               <div className="space-y-4">
                 <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
@@ -181,10 +186,10 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
-                  {questions.length} pergunta(s) • Arraste para reordenar
+                  {actualQuestions.length} pergunta(s) • Arraste para reordenar
                 </p>
                 <Badge variant="outline">
-                  {questions.filter(q => q.required).length} obrigatória(s)
+                  {actualQuestions.filter(q => q.required).length} obrigatória(s)
                 </Badge>
               </div>
 
@@ -195,11 +200,11 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
                 modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
               >
                 <SortableContext
-                  items={questions.map(q => q.id)}
+                  items={actualQuestions.map(q => q.id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-4">
-                    {questions
+                    {actualQuestions
                       .sort((a, b) => a.order - b.order)
                       .map((question) => (
                         <QuestionItem
@@ -232,7 +237,7 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
           questionnaire={{
             title,
             description,
-            questions: questions.sort((a, b) => a.order - b.order)
+            questions: actualQuestions.sort((a, b) => a.order - b.order)
           } as QuestionnaireData}
           onClose={() => setShowPreview(false)}
         />

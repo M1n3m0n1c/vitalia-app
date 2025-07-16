@@ -161,6 +161,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Garante que a barra de rolagem esteja sempre presente, evitando saltos de layout */
+    overflow-y: scroll;
   }
 }
 

@@ -113,6 +113,38 @@ export default function DebugPage() {
           </pre>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Páginas de Teste</CardTitle>
+          <CardDescription>Links para páginas de debug específicas</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Button variant="outline" onClick={() => window.location.href = '/debug/test-existing-questionnaire'}>
+              Teste: Questionário Existente
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/debug/test-builder-sync'}>
+              Teste: Sincronização Builder
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/debug/test-store-persistence'}>
+              Teste: Persistência do Store
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/debug/test-questions'}>
+              Teste: Perguntas
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/debug/facial-svg-test'}>
+              Teste: SVG Facial
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/debug/body-svg-test'}>
+              Teste: SVG Corporal
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/debug/leaflet-face-test'}>
+              Teste: Leaflet Face
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

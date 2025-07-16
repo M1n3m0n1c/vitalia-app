@@ -149,7 +149,7 @@ export const questionnaireSchema = z.object({
 export const questionBankSchema = z.object({
   id: z.string().optional(),
   question_text: z.string().min(1, 'Texto da pergunta é obrigatório'),
-  question_type: z.enum(['text', 'radio', 'checkbox', 'scale', 'date', 'file', 'yes_no', 'slider']),
+  question_type: z.enum(['text', 'radio', 'checkbox', 'scale', 'date', 'file', 'yes_no', 'slider', 'facial_complaints', 'body_complaints']),
   options: z.any().optional(), // JSON field
   category: z.string().optional(),
   specialty: z.enum(MEDICAL_SPECIALTIES).optional(),
@@ -169,7 +169,7 @@ export const questionnaireFiltersSchema = z.object({
 // Schema para filtros do banco de perguntas
 export const questionBankFiltersSchema = z.object({
   search: z.string().optional(),
-  question_type: z.enum(['text', 'radio', 'checkbox', 'scale', 'date', 'file', 'yes_no', 'slider']).optional(),
+  question_type: z.enum(['text', 'radio', 'checkbox', 'scale', 'date', 'file', 'yes_no', 'slider', 'facial_complaints', 'body_complaints']).optional(),
   category: z.string().optional(),
   specialty: z.enum(MEDICAL_SPECIALTIES).optional(),
   is_default: z.boolean().optional(),

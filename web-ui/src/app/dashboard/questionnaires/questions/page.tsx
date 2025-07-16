@@ -48,12 +48,14 @@ const QUESTION_TYPES = [
   { value: 'slider', label: 'Escala Visual' },
   { value: 'date', label: 'Data' },
   { value: 'file', label: 'Upload de Arquivo' },
-  { value: 'yes_no', label: 'Sim/Não/Não Sei' }
+  { value: 'yes_no', label: 'Sim/Não/Não Sei' },
+  { value: 'facial_complaints', label: 'Queixas Faciais' },
+  { value: 'body_complaints', label: 'Queixas Corporais' }
 ]
 
 const questionSchema = z.object({
   question_text: z.string().min(5, 'A pergunta deve ter pelo menos 5 caracteres'),
-  question_type: z.enum(['text', 'radio', 'checkbox', 'scale', 'slider', 'date', 'file', 'yes_no']),
+  question_type: z.enum(['text', 'radio', 'checkbox', 'scale', 'slider', 'date', 'file', 'yes_no', 'facial_complaints', 'body_complaints']),
   category: z.string().min(1, 'Selecione uma categoria'),
   specialty: z.string().min(1, 'Selecione uma especialidade'),
   options: z.string().optional()

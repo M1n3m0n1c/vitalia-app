@@ -44,7 +44,9 @@ const QUESTION_TYPE_ICONS = {
   slider: Sliders,
   date: Calendar,
   file: Upload,
-  yes_no: HelpCircle
+  yes_no: HelpCircle,
+  facial_complaints: Type,
+  body_complaints: Type
 }
 
 const QUESTION_TYPE_LABELS = {
@@ -55,7 +57,9 @@ const QUESTION_TYPE_LABELS = {
   slider: 'Escala Visual',
   date: 'Data',
   file: 'Upload de Arquivo',
-  yes_no: 'Sim/Não/Não Sei'
+  yes_no: 'Sim/Não/Não Sei',
+  facial_complaints: 'Queixas Faciais',
+  body_complaints: 'Queixas Corporais'
 }
 
 export function QuestionItem({ question, onUpdate, onDelete, onDuplicate }: QuestionItemProps) {
