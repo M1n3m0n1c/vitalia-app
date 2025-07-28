@@ -66,7 +66,7 @@ export function QuestionRenderer({
         return <FacialComplaintsQuestion 
           question={question as any} 
           value={(value as any)?.value || []} 
-          onChange={(newValue) => onChange({ question_type: 'facial_complaints', value: newValue })}
+          onChange={(newValue) => onChange({ question_id: question.id, question_type: 'facial_complaints', value: newValue })}
           error={error}
         />
       
@@ -74,7 +74,7 @@ export function QuestionRenderer({
         return <BodyComplaintsQuestion 
           question={question as any} 
           value={(value as any)?.value || []} 
-          onChange={(newValue) => onChange({ question_type: 'body_complaints', value: newValue })}
+          onChange={(newValue) => onChange({ question_id: question.id, question_type: 'body_complaints', value: newValue })}
           error={error}
         />
       

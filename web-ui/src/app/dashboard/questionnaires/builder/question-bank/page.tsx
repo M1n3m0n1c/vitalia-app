@@ -73,7 +73,8 @@ export default function QuestionBankPage() {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch('/api/questions-bank')
+      // Usar limite maior para carregar mais perguntas
+      const response = await fetch('/api/questions-bank?limit=100')
       const data = await response.json()
       
       if (response.ok) {
@@ -130,18 +131,72 @@ export default function QuestionBankPage() {
 
   const handleAddSelected = () => {
     const questionsToAdd = filteredQuestions.filter(q => selectedQuestions.has(q.id))
+    
     if (questionsToAdd.length === 0) {
       toast.error('Selecione pelo menos uma pergunta')
       return
     }
-    addQuestions(questionsToAdd.map((bankQuestion, index) => ({
-      id: `question_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
-      question_text: bankQuestion.question_text,
-      question_type: bankQuestion.question_type as any,
-      required: false,
-      order: 0, // será ajustado na store
-      options: bankQuestion.options || undefined
-    })))
+    
+    // Converter perguntas do banco para formato do questionário
+    const questionsForBuilder = questionsToAdd.map((bankQuestion) => {
+      const baseQuestion = {
+        id: bankQuestion.id, // Será regenerado no store
+        question_text: bankQuestion.question_text,
+        question_type: bankQuestion.question_type as any,
+        required: false,
+        order: 0, // será ajustado na store
+      }
+
+      // Adicionar campos específicos para cada tipo de pergunta
+      switch (bankQuestion.question_type) {
+        case 'facial_complaints':
+          return {
+            ...baseQuestion,
+            regions: bankQuestion.options?.regions || [],
+            allow_multiple: bankQuestion.options?.allow_multiple ?? true
+          }
+        case 'body_complaints':
+          return {
+            ...baseQuestion,
+            regions: bankQuestion.options?.regions || [],
+            allow_multiple: bankQuestion.options?.allow_multiple ?? true
+          }
+        case 'radio':
+        case 'checkbox':
+          return {
+            ...baseQuestion,
+            options: bankQuestion.options || []
+          }
+        case 'scale':
+        case 'slider':
+          return {
+            ...baseQuestion,
+            min_value: bankQuestion.options?.min_value || 0,
+            max_value: bankQuestion.options?.max_value || 10,
+            step: bankQuestion.options?.step || 1,
+            labels: bankQuestion.options?.labels || {}
+          }
+        case 'file':
+          return {
+            ...baseQuestion,
+            accepted_types: bankQuestion.options?.accepted_types || ['*'],
+            max_size_mb: bankQuestion.options?.max_size_mb || 10,
+            max_files: bankQuestion.options?.max_files || 1
+          }
+        case 'yes_no':
+          return {
+            ...baseQuestion,
+            labels: bankQuestion.options?.labels || {}
+          }
+        default:
+          return {
+            ...baseQuestion,
+            ...(bankQuestion.options && { options: bankQuestion.options })
+          }
+      }
+    })
+    
+    addQuestions(questionsForBuilder)
     toast.success(`${questionsToAdd.length} pergunta(s) adicionada(s) ao questionário!`)
     router.back()
   }

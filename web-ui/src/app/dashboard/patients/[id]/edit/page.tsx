@@ -81,7 +81,7 @@ export default function EditPatientPage() {
       }
 
       // Redirecionar para a lista de pacientes
-      router.push('/patients')
+      router.push('/dashboard/patients')
 
       // Você pode adicionar uma notificação de sucesso aqui
       // toast.success('Paciente atualizado com sucesso!')
@@ -92,7 +92,7 @@ export default function EditPatientPage() {
   }
 
   const handleCancel = () => {
-    router.push('/patients')
+    router.push('/dashboard/patients')
   }
 
   if (loading) {

@@ -8,8 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
-import { Questionnaire } from '@/lib/supabase/database.types'
+import { Tables } from '@/lib/supabase/database.types'
+
+type Questionnaire = Tables<'questionnaires'>
 import Link from 'next/link'
 import { PatientSelectModal } from '@/components/patients/PatientSelectModal'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -278,7 +281,7 @@ export default function QuestionnairesPage() {
                       {questionnaire.title}
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-2">
-                      <Badge variant={questionnaire.is_active ? 'default' : 'secondary'}>
+                      <Badge variant={questionnaire.is_active ? 'default' : 'destructive'}>
                         {questionnaire.is_active ? 'Ativo' : 'Inativo'}
                       </Badge>
                       <Badge variant="outline">
@@ -288,9 +291,18 @@ export default function QuestionnairesPage() {
                   </div>
                 </div>
                 {questionnaire.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {questionnaire.description}
-                  </p>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-sm text-muted-foreground line-clamp-2 cursor-help">
+                          {questionnaire.description}
+                        </p>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs whitespace-pre-wrap">{questionnaire.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
               </CardHeader>
               <CardContent>
@@ -320,7 +332,7 @@ export default function QuestionnairesPage() {
                   <div className="flex gap-2">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="flex-1">
+                        <Button variant="outline" size="sm" className="flex-1 text-red-600 hover:text-red-700">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Excluir
                         </Button>
@@ -347,7 +359,7 @@ export default function QuestionnairesPage() {
 
                   {/* Botão sempre visível */}
                   <div className="mt-2 flex justify-center">
-                    <Button size="sm" variant="secondary" onClick={() => setSelectingQuestionnaireId(questionnaire.id)}>
+                    <Button size="sm" variant="outline" className="flex-1 hover:bg-accent hover:text-accent-foreground" onClick={() => setSelectingQuestionnaireId(questionnaire.id)}>
                       <Copy className="h-4 w-4 mr-2" />
                       Gerar link público
                     </Button>

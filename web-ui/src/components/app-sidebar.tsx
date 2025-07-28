@@ -60,6 +60,11 @@ const menuItems = [
     icon: FileText,
   },
   {
+    title: 'Respostas',
+    url: '/dashboard/responses',
+    icon: Search,
+  },
+  {
     title: 'Calendário',
     url: '/dashboard/calendar',
     icon: Calendar,

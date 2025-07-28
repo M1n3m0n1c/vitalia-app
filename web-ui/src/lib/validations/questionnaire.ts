@@ -108,6 +108,18 @@ export const yesNoQuestionSchema = baseQuestionSchema.extend({
   }).optional()
 })
 
+export const facialComplaintsQuestionSchema = baseQuestionSchema.extend({
+  question_type: z.literal('facial_complaints'),
+  regions: z.array(z.string()).optional(),
+  allow_multiple: z.boolean().default(true)
+})
+
+export const bodyComplaintsQuestionSchema = baseQuestionSchema.extend({
+  question_type: z.literal('body_complaints'),
+  regions: z.array(z.string()).optional(),
+  allow_multiple: z.boolean().default(true)
+})
+
 // Union schema para qualquer tipo de pergunta
 export const questionSchema = z.union([
   textQuestionSchema,
@@ -117,7 +129,9 @@ export const questionSchema = z.union([
   sliderQuestionSchema,
   dateQuestionSchema,
   fileQuestionSchema,
-  yesNoQuestionSchema
+  yesNoQuestionSchema,
+  facialComplaintsQuestionSchema,
+  bodyComplaintsQuestionSchema
 ])
 
 // Schema para questionário completo

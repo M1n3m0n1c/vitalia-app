@@ -4,6 +4,7 @@ import { User, Session } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 import { supabase } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 interface AuthContextType {
   user: User | null
@@ -25,18 +26,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Obter sessão inicial
     const getInitialSession = async () => {
-      console.log('🔄 AuthProvider - Obtendo sessão inicial...')
+      logger.debug('Obtendo sessão inicial...', undefined, 'AuthProvider')
       const {
         data: { session },
         error,
       } = await supabase.auth.getSession()
 
       if (error) {
-        console.error('❌ AuthProvider - Erro ao obter sessão:', error)
+        logger.error('Erro ao obter sessão', error, 'AuthProvider')
       } else {
-        console.log(
-          '✅ AuthProvider - Sessão inicial:',
-          session?.user?.email || 'nenhuma'
+        logger.info(
+          'Sessão inicial obtida',
+          { email: session?.user?.email || 'nenhuma' },
+          'AuthProvider'
         )
         setSession(session)
         setUser(session?.user ?? null)
@@ -51,10 +53,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log(
-        '🔄 AuthProvider - Auth state changed:',
-        event,
-        session?.user?.email
+      logger.debug(
+        'Auth state changed',
+        { event, email: session?.user?.email },
+        'AuthProvider'
       )
 
       setSession(session)
@@ -63,8 +65,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Forçar refresh da página em mudanças críticas para sincronizar cookies
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        console.log(
-          '🔄 AuthProvider - Forçando refresh para sincronizar cookies...'
+        logger.info(
+          'Forçando refresh para sincronizar cookies',
+          { event },
+          'AuthProvider'
         )
         // Aguardar um pouco para os cookies serem definidos
         setTimeout(() => {

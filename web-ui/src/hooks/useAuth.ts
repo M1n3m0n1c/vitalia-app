@@ -26,7 +26,6 @@ export interface AuthState {
 }
 
 export function useAuth() {
-  console.log('useAuth hook called')
   const [state, setState] = useState<AuthState>({
     user: null,
     profile: null,
@@ -242,10 +241,8 @@ export function useAuth() {
   // Inicialização e listener de auth
   useEffect(() => {
     let mounted = true
-    console.log('useEffect in useAuth triggered. Initial state:', state)
 
     const initializeAuth = async () => {
-      console.log('initializeAuth called. Current state:', state)
       try {
         // Obter sessão inicial
         const {
@@ -261,19 +258,14 @@ export function useAuth() {
               loading: false,
               error: sessionError.message,
             }))
-            console.log(
-              'State updated: sessionError. New loading:',
-              false,
-              'profile:',
-              null
-            )
+
           }
           return
         }
 
         let user = null
         if (session) {
-          console.log('Session found, attempting to get user...')
+
           const { data: userData, error: userError } =
             await supabase.auth.getUser()
           if (userError) {
@@ -289,23 +281,14 @@ export function useAuth() {
                 profile: null,
                 error: userError.message,
               }))
-              console.log(
-                'State updated: userError. New loading:',
-                false,
-                'user:',
-                null,
-                'profile:',
-                null
-              )
+
             }
             return
           }
           user = userData.user
-          console.log('User data from getUser (initializeAuth):', user)
         }
 
         if (user && mounted) {
-          console.log('✅ Usuário encontrado, buscando perfil...')
           const profile = await fetchUserProfile(user.id)
           setState({
             user: user,
@@ -314,14 +297,6 @@ export function useAuth() {
             loading: false,
             error: null,
           })
-          console.log(
-            'State updated: user and profile found. New loading:',
-            false,
-            'user:',
-            user,
-            'profile:',
-            profile
-          )
         } else if (mounted) {
           console.log(
             'No user or session after initialization. Setting loading to false and nulling user/profile.'

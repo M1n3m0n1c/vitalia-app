@@ -20,11 +20,9 @@ import {
   restrictToVerticalAxis,
   restrictToWindowEdges,
 } from '@dnd-kit/modifiers'
-import { Plus, Database, Search, Eye } from 'lucide-react'
+import { Plus, Database, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Question } from '@/types/questionnaire'
@@ -42,8 +40,7 @@ interface QuestionnaireBuilderProps {
   description?: string
 }
 
-export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Questionário sem título', description }: QuestionnaireBuilderProps) {
-  const [showQuestionBank, setShowQuestionBank] = useState(false)
+function QuestionnaireBuilderContent({ questions, onQuestionsChange, title = 'Questionário sem título', description }: QuestionnaireBuilderProps) {
   const [showNewQuestion, setShowNewQuestion] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   
@@ -55,9 +52,9 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
   )
 
   const router = useRouter()
-  const { questions: storeQuestions } = useQuestionnaireBuilderStore()
+  const { questions: storeQuestions, setQuestions: setStoreQuestions } = useQuestionnaireBuilderStore()
   
-  // Usar as perguntas do store se disponíveis, senão usar as props
+  // Usar as perguntas do store como prioridade, senão as das props
   const actualQuestions = storeQuestions.length > 0 ? storeQuestions : questions
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -72,6 +69,8 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
         order: index
       }))
 
+      setStoreQuestions(reorderedQuestions)
+      // Informar parent sobre mudança sem criar loop
       onQuestionsChange(reorderedQuestions)
       toast.success('Pergunta reordenada!')
     }
@@ -84,7 +83,10 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
       order: actualQuestions.length
     }
     
-    onQuestionsChange([...actualQuestions, newQuestion])
+    const updatedQuestions = [...actualQuestions, newQuestion]
+    setStoreQuestions(updatedQuestions)
+    // Informar parent sobre mudança
+    onQuestionsChange(updatedQuestions)
     toast.success('Pergunta adicionada!')
   }
 
@@ -92,6 +94,8 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
     const updatedQuestions = actualQuestions.map(q =>
       q.id === questionId ? { ...q, ...updatedQuestion } as Question : q
     )
+    setStoreQuestions(updatedQuestions)
+    // Informar parent sobre mudança
     onQuestionsChange(updatedQuestions)
     toast.success('Pergunta atualizada!')
   }
@@ -101,6 +105,8 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
       .filter(q => q.id !== questionId)
       .map((q, index) => ({ ...q, order: index }))
     
+    setStoreQuestions(filteredQuestions)
+    // Informar parent sobre mudança
     onQuestionsChange(filteredQuestions)
     toast.success('Pergunta removida!')
   }
@@ -115,7 +121,10 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
         order: actualQuestions.length
       }
       
-      onQuestionsChange([...actualQuestions, duplicatedQuestion])
+      const updatedQuestions = [...actualQuestions, duplicatedQuestion]
+      setStoreQuestions(updatedQuestions)
+      // Informar parent sobre mudança
+      onQuestionsChange(updatedQuestions)
       toast.success('Pergunta duplicada!')
     }
   }
@@ -244,4 +253,8 @@ export function QuestionnaireBuilder({ questions, onQuestionsChange, title = 'Qu
       )}
     </div>
   )
+}
+
+export function QuestionnaireBuilder(props: QuestionnaireBuilderProps) {
+  return <QuestionnaireBuilderContent {...props} />
 } 

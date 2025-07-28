@@ -160,7 +160,7 @@ export default function PatientsPage() {
 
   // Função para navegar para edição
   const handleEdit = (patientId: string) => {
-    router.push(`/patients/${patientId}/edit`)
+          router.push(`/dashboard/patients/${patientId}/edit`)
   }
 
   // Função para excluir paciente
@@ -197,7 +197,7 @@ export default function PatientsPage() {
           </p>
         </div>
         <Button
-          onClick={() => router.push('/patients/new')}
+          onClick={() => router.push('/dashboard/patients/new')}
           className='flex items-center gap-2'
         >
           <Plus className='h-4 w-4' />
@@ -309,7 +309,7 @@ export default function PatientsPage() {
               </p>
               {!search && (!gender || gender === 'all') && (
                 <Button
-                  onClick={() => router.push('/patients/new')}
+                  onClick={() => router.push('/dashboard/patients/new')}
                   className='mt-4'
                 >
                   <Plus className='mr-2 h-4 w-4' />

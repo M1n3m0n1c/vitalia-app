@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatDateBrasilia } from "@/lib/utils/date"
 import Link from "next/link"
-import { Questionnaire } from "@/lib/supabase/database.types"
+import { Tables } from "@/lib/supabase/database.types"
+
+type Questionnaire = Tables<'questionnaires'>
 import { Question } from '@/types/questionnaire'
 
 const CATEGORIES = [
@@ -127,7 +129,11 @@ export default function QuestionnaireDetailPage() {
               <Button variant="outline">Editar</Button>
             </Link>
             <Link href="/dashboard/questionnaires">
-              <Button variant="secondary">Voltar</Button>
+              <Button 
+                className="bg-[#F5F5F4] text-gray-700 hover:bg-[#E7E5E4] border border-gray-300"
+              >
+                Voltar
+              </Button>
             </Link>
           </div>
         </CardContent>

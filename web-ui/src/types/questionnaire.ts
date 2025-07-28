@@ -149,12 +149,12 @@ export interface YesNoAnswer extends BaseAnswer {
   value: 'yes' | 'no' | 'unknown'
 }
 
-export interface FacialComplaintsAnswer {
+export interface FacialComplaintsAnswer extends BaseAnswer {
   question_type: 'facial_complaints'
   value: string[]
 }
 
-export interface BodyComplaintsAnswer {
+export interface BodyComplaintsAnswer extends BaseAnswer {
   question_type: 'body_complaints'
   value: string[]
 }

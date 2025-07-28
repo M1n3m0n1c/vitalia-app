@@ -77,7 +77,7 @@ function LoginForm() {
         // Com o Supabase SSR, os cookies são gerenciados automaticamente
         // Aguardar um momento e redirecionar
         setTimeout(() => {
-          window.location.href = redirectTo
+          router.push(redirectTo)
         }, 500)
       } else {
         toast.error('Erro ao fazer login', {

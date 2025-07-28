@@ -128,18 +128,20 @@ export default function PublicQuestionnairePage({ params }: { params: Promise<{ 
   }
 
   return (
-    <Card className="max-w-2xl mx-auto mt-8">
-      <CardHeader>
-        <CardTitle>{questionnaire.title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <QuestionnaireForm
-          title={questionnaire.title}
-          description={questionnaire.description}
-          questions={questionnaire.questions}
-          onSubmit={handleSubmit}
-        />
-      </CardContent>
-    </Card>
+    <div className="container mx-auto px-4 py-8">
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>{questionnaire.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <QuestionnaireForm
+            title={questionnaire.title}
+            description={questionnaire.description}
+            questions={questionnaire.questions}
+            onSubmit={handleSubmit}
+          />
+        </CardContent>
+      </Card>
+    </div>
   )
 } 

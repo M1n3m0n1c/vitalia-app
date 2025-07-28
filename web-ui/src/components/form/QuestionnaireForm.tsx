@@ -27,13 +27,17 @@ export function QuestionnaireForm({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
 
   const handleAnswerChange = (answer: Answer) => {
+    console.log('Answer change:', answer)
+    
     setAnswers(prev => {
       const existing = prev.findIndex(a => a.question_id === answer.question_id)
       if (existing >= 0) {
         const updated = [...prev]
         updated[existing] = answer
+        console.log('Updated existing answer:', updated)
         return updated
       }
+      console.log('Added new answer:', [...prev, answer])
       return [...prev, answer]
     })
     
@@ -96,6 +100,16 @@ export function QuestionnaireForm({
             case 'yes_no':
               if (answer.question_type === 'yes_no' && !answer.value) {
                 newErrors[question.id] = 'Selecione uma opção'
+              }
+              break
+            case 'facial_complaints':
+              if (answer.question_type === 'facial_complaints' && (!answer.value || answer.value.length === 0)) {
+                newErrors[question.id] = 'Selecione pelo menos uma queixa'
+              }
+              break
+            case 'body_complaints':
+              if (answer.question_type === 'body_complaints' && (!answer.value || answer.value.length === 0)) {
+                newErrors[question.id] = 'Selecione pelo menos uma queixa'
               }
               break
           }

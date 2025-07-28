@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { logger } from '@/lib/utils/logger'
 
 // Rotas que não precisam de autenticação
 const publicRoutes = [
@@ -92,7 +93,7 @@ export async function middleware(req: NextRequest) {
     } = await supabase.auth.getSession()
 
     if (sessionError) {
-      console.error('❌ Erro no middleware ao obter a sessão:', sessionError)
+      logger.error('Erro no middleware ao obter a sessão', sessionError, 'Middleware')
       // Se houver um erro na sessão, assumir que não está autenticado
       return res
     }
@@ -101,9 +102,10 @@ export async function middleware(req: NextRequest) {
     if (session) {
       const { data: userData, error: userError } = await supabase.auth.getUser()
       if (userError) {
-        console.error(
-          '❌ Erro no middleware ao obter o usuário autenticado:',
-          userError
+        logger.error(
+          'Erro no middleware ao obter o usuário autenticado',
+          userError,
+          'Middleware'
         )
         // Se houver um erro ao obter o usuário, assumir que não está autenticado
         return res
@@ -114,8 +116,10 @@ export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl
     const isAuthenticated = !!user
 
-    console.log(
-      `🔍 Middleware - Rota: ${pathname}, Autenticado: ${isAuthenticated}`
+    logger.debug(
+      'Middleware verificando rota',
+      { pathname, isAuthenticated },
+      'Middleware'
     )
 
     // Verificar se é uma rota pública
@@ -135,13 +139,13 @@ export async function middleware(req: NextRequest) {
 
     // Se usuário autenticado tenta acessar rotas de auth (login, register)
     if (isAuthenticated && isAuthOnlyRoute) {
-      console.log('🔄 Redirecionando usuário autenticado para dashboard')
+      logger.info('Redirecionando usuário autenticado para dashboard', { pathname }, 'Middleware')
       return NextResponse.redirect(new URL('/dashboard', req.url))
     }
 
     // Se usuário não autenticado tenta acessar rota protegida
     if (!isAuthenticated && isProtectedRoute) {
-      console.log('🔒 Redirecionando usuário não autenticado para login')
+      logger.info('Redirecionando usuário não autenticado para login', { pathname }, 'Middleware')
       // Evitar loop infinito de redirecionamentos
       if (pathname === '/login') {
         return res
@@ -157,7 +161,7 @@ export async function middleware(req: NextRequest) {
 
     // Redirecionar página inicial para dashboard se autenticado
     if (isAuthenticated && pathname === '/') {
-      console.log('🏠 Redirecionando página inicial para dashboard')
+      logger.info('Redirecionando página inicial para dashboard', undefined, 'Middleware')
       return NextResponse.redirect(new URL('/dashboard', req.url))
     }
 
@@ -169,21 +173,8 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL('/login', req.url))
       }
 
-      // Verificar se o token é válido
-      const { data: linkData, error: linkError } = await supabase
-        .from('public_links')
-        .select('*')
-        .eq('token', token)
-        .eq('is_used', false)
-        .gt('expires_at', new Date().toISOString())
-        .single()
-
-      if (linkError || !linkData) {
-        // Token inválido ou expirado
-        return NextResponse.redirect(new URL('/login', req.url))
-      }
-
-      // Token válido, permitir acesso
+      // Para links públicos, permitir acesso sem validação no middleware
+      // A validação será feita na página/API route específica
       return res
     }
 
@@ -206,10 +197,10 @@ export async function middleware(req: NextRequest) {
       }
     }
 
-    console.log('✅ Middleware - Permitindo acesso')
+    logger.debug('Middleware permitindo acesso', { pathname }, 'Middleware')
     return res
   } catch (error) {
-    console.error('❌ Erro inesperado no middleware:', error)
+    logger.error('Erro inesperado no middleware', error, 'Middleware')
     return res
   }
 }

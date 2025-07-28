@@ -35,7 +35,7 @@ export default function NewPatientPage() {
       const result = await response.json()
 
       // Redirecionar para a lista de pacientes
-      router.push('/patients')
+      router.push('/dashboard/patients')
 
       // Você pode adicionar uma notificação de sucesso aqui
       // toast.success('Paciente cadastrado com sucesso!')
@@ -46,7 +46,7 @@ export default function NewPatientPage() {
   }
 
   const handleCancel = () => {
-    router.push('/patients')
+    router.push('/dashboard/patients')
   }
 
   return (
