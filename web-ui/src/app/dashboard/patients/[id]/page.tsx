@@ -64,7 +64,7 @@ export default async function PatientDetailsPage({
         .select('id', { count: 'exact' })
         .eq('patient_id', resolvedParams.id),
       supabase
-        .from('responses')
+        .from('questionnaire_responses')
         .select('id', { count: 'exact' })
         .eq('patient_id', resolvedParams.id),
       supabase
@@ -83,7 +83,7 @@ export default async function PatientDetailsPage({
       .limit(1)
       .single(),
     supabase
-      .from('responses')
+      .from('questionnaire_responses')
       .select('created_at')
       .eq('patient_id', resolvedParams.id)
       .order('created_at', { ascending: false })
@@ -107,10 +107,10 @@ export default async function PatientDetailsPage({
     : null
 
   const stats = {
-    documents: documentsResult.count || 0,
-    responses: responsesResult.count || 0,
-    appointments: appointmentsResult.count || 0,
-    lastActivity: lastActivity ? formatDateBrasilia(lastActivity) : 'Nenhuma atividade'
+    totalDocuments: documentsResult.count || 0,
+    totalResponses: responsesResult.count || 0,
+    totalAppointments: appointmentsResult.count || 0,
+    lastActivity: lastActivity ? formatDateBrasilia(lastActivity) : null
   }
 
   return (

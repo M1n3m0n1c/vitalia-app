@@ -29,10 +29,10 @@ import { formatDateBrasilia } from '@/lib/utils/date'
 interface PatientDetailsClientProps {
   patient: any
   stats: {
-    documents: number
-    responses: number
-    appointments: number
-    lastActivity: string
+    totalDocuments: number
+    totalResponses: number
+    totalAppointments: number
+    lastActivity: string | null
   }
   patientId: string
 }

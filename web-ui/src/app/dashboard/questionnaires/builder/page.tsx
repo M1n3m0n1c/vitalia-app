@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Save, Eye, Plus, Settings, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -400,5 +400,11 @@ function QuestionnaireBuilderPageContent() {
 }
 
 export default function QuestionnaireBuilderPage() {
-  return <QuestionnaireBuilderPageContent />
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Suspense fallback={<div>Carregando...</div>}>
+        <QuestionnaireBuilderPageContent />
+      </Suspense>
+    </div>
+  )
 } 
